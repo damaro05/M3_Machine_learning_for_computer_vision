@@ -1,9 +1,13 @@
 import numpy as np
 import cv2
 import sys
+import os
+import pickle #module for serialization of python object structure
+import gzip   #we can compress our data directly when writting data to a file
 
 class FeatureExtractor:
     def __init__(self, method):
+        self.method=method
         if method == 'sift':
             self.f = self._sift_features
         else:
@@ -18,7 +22,14 @@ class FeatureExtractor:
         print(str(len(kpt)) + ' extracted keypoints and descriptors')
         return des
 
-    def extract_features(self, train_images_filenames, train_labels, nimmax=float('inf')):
+    def extract_features(self, train_images_filenames, train_labels, nimmax=float('inf'),picklepath='../../FeaturePickles'):
+        # If features were previously computed, load them directly
+        if os.path.exists(picklepath+'/'+self.method+'.pklz'):
+            with gzip.open(picklepath+'/'+self.method+'.pklz', 'rb') as f:
+                (D, L) = pickle.load(f)
+                return (D, L)
+
+        # If not ...
         Train_descriptors = []
         Train_label_per_descriptor = []
 
@@ -38,6 +49,12 @@ class FeatureExtractor:
         for i in range(1, len(Train_descriptors)):
             D = np.vstack((D, Train_descriptors[i]))
             L = np.hstack((L, np.array([Train_label_per_descriptor[i]] * Train_descriptors[i].shape[0])))
+
+        # Save features in a pickle
+        if not os.path.exists(picklepath):
+            os.makedirs(picklepath)
+        with gzip.open(picklepath+'/'+self.method+'.pklz','wb') as f:
+            pickle.dump((D,L),f,pickle.HIGHEST_PROTOCOL)
 
         return (D, L)
 
