@@ -44,7 +44,7 @@ if not os.path.isfile(filename):
 	        numcorrect += 1
 	
 	print 'Saving predicted clases'
-	np.save('knn_classifier.npy', predicted_clases)
+	np.save(filename, predicted_clases)
 	print('Final accuracy: ' + str(numcorrect*100.0/numtestimages))
 else:
 	print 'Loading previous predictions'
