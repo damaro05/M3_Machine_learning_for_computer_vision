@@ -6,6 +6,7 @@ import numpy as np
 class Classifier:
     def __init__(self, method):
         if method == 'knn':
+            self.name = 'knn_classifier'
             self.fit = self._knn_fit
             self.predict = self._knn_predict
         else:
