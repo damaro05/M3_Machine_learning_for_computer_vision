@@ -9,7 +9,7 @@ from classifier import Classifier
 
 #######################
 force_reload = False
-feature_method = 'sift'
+feature_method = 'hog'
 classifier = 'knn'
 #######################
 
@@ -22,10 +22,10 @@ print('Loaded ' + str(len(train_images_filenames)) + ' training images filenames
 print('Loaded ' + str(len(test_images_filenames)) + ' testing images filenames with classes ', set(test_labels))
 
 # Load precomputed labels if avaliable
-filename = classifier + '_' + feature_method + '.npy'
-if os.path.isfile(filename) and not force_reload:
+precomp_label_filename = classifier + '_' + feature_method + '.npy'
+if os.path.isfile(precomp_label_filename) and not force_reload:
     print 'Loading previous predictions'
-    predicted_classes = np.load(filename)
+    predicted_classes = np.load(precomp_label_filename)
 else:
     start = time.time()
 
@@ -41,18 +41,18 @@ else:
     numtestimages = 0
     predicted_classes = []
     for i in range(len(test_images_filenames)):
-        filename = test_images_filenames[i]
-        des = fe.extract_single_image_features(filename)
+        imfilename = test_images_filenames[i]
+        des = fe.extract_single_image_features(imfilename)
         predictedclass = c.predict(des)
         predicted_classes.append(predictedclass)
-        print('image ' + filename + ' was from class ' + test_labels[i] + ' and was predicted ' + predictedclass)
+        print('image ' + imfilename + ' was from class ' + test_labels[i] + ' and was predicted ' + predictedclass)
         numtestimages += 1
 
     end = time.time()
     print('Done in ' + str(end - start) + ' secs.')
 
     print 'Saving predicted clases'
-    np.save(filename, predicted_classes)
+    np.save(precomp_label_filename, predicted_classes)
 
 numcorrect = np.sum(predicted_classes == test_labels)
 print('Final accuracy: ' + str(numcorrect * 100.0 / len(predicted_classes)))
