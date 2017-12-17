@@ -54,6 +54,16 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     plt.savefig('confusionmatrix.png')
     plt.show()
 
+def kFoldValidation(trainSet, n_splits):
+    """ This function defines a subset of training and test sets for n iterations """
+    kf = KFold(n_splits=n_splits)
+    train = []
+    test = []
+    for trainIdx, testIdx in kf.split(trainSet):
+        train.append(trainIdx)
+        test.append(testIdx)
+
+    return train, test
 
 def plot_roc_curve(Gtruth, predicted, classifier):
     """ This function plots the ROC curve of each class.
