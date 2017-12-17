@@ -90,4 +90,4 @@ class LogisticRegression():
                         probabilities[i,y2] = probabilities[i,y2] + 1 - self._classify_vector_prob(x[i, :],j)
                         j=j+1
 
-        return np.argmax(probabilities,axis=1)
+        return self.labels[np.argmax(probabilities,axis=1)]
