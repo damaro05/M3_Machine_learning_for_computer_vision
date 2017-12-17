@@ -9,8 +9,8 @@ from classifier import Classifier
 
 #######################
 force_reload = False
-feature_method = 'hog'
-classifier = 'knn'
+feature_method = 'sift'
+classifier = 'bayes'
 #######################
 
 # Input images and labels
@@ -64,7 +64,7 @@ print 'Average precision'
 print average_precision
 print evaluation.confusionMatrix(test_labels, predicted_classes, True, True)
 
-# classifier_probabilities = c.predict_proba(predicted_clases)
-# evaluation.plot_roc_curve(test_labels, predicted_clases)
-# evaluation.plot_roc_curve(test_labels, predicted_clases, c, classifier_probabilities)
-# evaluation.plot_roc_curve(test_labels, predicted_clases, c)
+# classifier_probabilities = c.predict_proba(predicted_classes)
+# evaluation.plot_roc_curve(test_labels, predicted_classes)
+# evaluation.plot_roc_curve(test_labels, predicted_classes, c, classifier_probabilities)
+# evaluation.plot_roc_curve(test_labels, predicted_classes, c)

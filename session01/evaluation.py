@@ -9,8 +9,6 @@ from sklearn.metrics import average_precision_score
 from sklearn import metrics
 from itertools import cycle
 
-from sklearn.neighbors import KNeighborsClassifier
-
 
 def confusionMatrix(Gtruth, predicted, graph=False, normalization=False):
     """ This fucntion calculates the confusion matrix, normalization
@@ -21,7 +19,6 @@ def confusionMatrix(Gtruth, predicted, graph=False, normalization=False):
     if graph is False:
         return cm
 
-    #classes = ['mountain', 'inside_city', 'Opencountry', 'coast', 'street', 'forest', 'tallbuilding', 'highway']
     plot_confusion_matrix(cm, classes, normalization)
 
     return cm
@@ -57,7 +54,7 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     plt.show()
 
 
-def plot_roc_curve(Gtruth, predicted, classifier=None, classifierProb=None):
+def plot_roc_curve(Gtruth, predicted, classifier):
     """ This function plots the ROC curve of each class.
         A classifier... """
     classes = ['mountain', 'inside_city', 'Opencountry', 'coast', 'street', 'forest', 'tallbuilding', 'highway']
@@ -66,14 +63,11 @@ def plot_roc_curve(Gtruth, predicted, classifier=None, classifierProb=None):
     #Gtruth = label_binarize(Gtruth, classes=[0, 1, 2, 3, 4, 5, 6, 7])
     #n_classes = Gtruth.shape[1]
 
-    #We predict probabilities
-    if classifierProb is not None:
-        predicted = classifierProb
-    elif classifier is not None:
-        predicted = classifier.predict_proba(predicted)
+    probas_ = classifier.predict_proba(predicted)
 
     for i in range(len(classes)):
-        fpr, tpr, thresholds = metrics.roc_curve(Gtruth, predicted[:,1], classes[i])
+        fpr, tpr, thresholds = metrics.roc_curve(Gtruth, probas_[:,1], classes[i])
+
         roc_auc = metrics.auc(fpr, tpr)
         plt.title('Receiver Operating Characteristic')
         plt.plot(fpr, tpr, label = classes[i] % roc_auc)

@@ -15,7 +15,7 @@ class FeatureExtractor:
         self.method=method
         if method == 'sift':
             self.f = self._sift_features
-        if method == 'aggsift':
+        elif method == 'aggsift':
             self.f = self._aggregated_sift_features
         elif method == 'surf':
             self.f = self._surf_features
