@@ -54,7 +54,7 @@ else:
     print 'Saving predicted clases'
     np.save(precomp_label_filename, predicted_classes)
 
-numcorrect = np.sum(predicted_classes == test_labels)
+numcorrect = np.sum(np.array(predicted_classes) == np.array(test_labels))
 print('Final accuracy: ' + str(numcorrect * 100.0 / len(predicted_classes)))
 precision, recall, fscore, support = evaluation.precision_recall_fscore(test_labels, predicted_classes)
 average_precision, _, _, _ = evaluation.precision_recall_fscore(test_labels, predicted_classes, True)
