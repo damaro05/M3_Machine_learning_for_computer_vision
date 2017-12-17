@@ -3,6 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn import tree
 from sklearn import svm
+from logistic_regression import LogisticRegression
 import sys
 import numpy as np
 
@@ -39,6 +40,11 @@ class Classifier:
             self.fit = self._lsvc_fit
             self.predict = self._lsvc_predict
             self.predict_proba = self._lsvc_predict_proba
+        elif method == 'logisticregression':
+            self.name = 'logistic_regression'
+            self.fit = self._lr_fit
+            self.predict = self._lr_predict
+            #self.predict_proba = self._lsvc_predict_proba
         else:
             print('Classifying method not found')
             sys.exit(-1)
@@ -58,6 +64,17 @@ class Classifier:
         pred_probabilities = self._classifier.predict_proba(X)
         print 'Predicted probabilities'
         return pred_probabilities
+
+    def _lr_fit(self, X, y):
+        print('Training the logistic regression...')
+        self._classifier = LogisticRegression()
+        self._classifier.fit(X, y)
+        print('Done!')
+
+    def _lr_predict(self, X):
+        predictions = self._classifier.predict(X)
+        values, counts = np.unique(predictions, return_counts=True)
+        return values[np.argmax(counts)]
 
     def _randomf_fit(self, X, y):
         print('Training the Random forest classifier...')
