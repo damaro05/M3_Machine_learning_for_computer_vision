@@ -51,6 +51,7 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    plt.savefig('confusionmatrix.png')
     plt.show()
 
 
@@ -80,14 +81,15 @@ def plot_roc_curve(Gtruth, predicted, classifier):
     plt.show()
 
 
-def precision_recall_fscore(Gtruth, predicted, averageP=False):
+def precision_recall_fscore(Gtruth, predicted, average=False):
     """ This function calculates the precision, recall, f-score and support.
         The average precision can be calculated by setting 'averageP'=True """
-    precision, recall, fscore, support = precision_recall_fscore_support(Gtruth, predicted)
-    average_precision = np.mean(precision)
-    if averageP is not False:
-        return average_precision, recall, fscore, support
-    return precision, recall, fscore, support
+    classes = ['mountain', 'inside_city', 'Opencountry', 'coast', 'street', 'forest', 'tallbuilding', 'highway']
+    precision, recall, fscore, support = precision_recall_fscore_support(Gtruth, predicted,labels=classes)
+    if average:
+        return np.mean(precision), np.mean(recall), np.mean(fscore), np.mean(support)
+    else:
+        return precision, recall, fscore, support
 
     
 def plot_precision_recall_curve():

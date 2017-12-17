@@ -9,8 +9,8 @@ from classifier import Classifier
 
 #######################
 force_reload = False
-feature_method = 'sift'
-classifier = 'bayes'
+feature_method = 'surf'
+classifier = 'knn'
 #######################
 
 # Input images and labels
@@ -57,11 +57,19 @@ else:
 numcorrect = np.sum(np.array(predicted_classes) == np.array(test_labels))
 print('Final accuracy: ' + str(numcorrect * 100.0 / len(predicted_classes)))
 precision, recall, fscore, support = evaluation.precision_recall_fscore(test_labels, predicted_classes)
-average_precision, _, _, _ = evaluation.precision_recall_fscore(test_labels, predicted_classes, True)
+average_precision, average_recall, average_fscore, average_support = evaluation.precision_recall_fscore(test_labels, predicted_classes, True)
 print 'Precision '
-print precision
+print np.round(precision*100,2)
 print 'Average precision'
-print average_precision
+print round(average_precision*100,2)
+print 'Recall '
+print np.round(recall*100,2)
+print 'Average recall'
+print round(average_recall*100,2)
+print 'F1'
+print np.round(fscore*100,2)
+print 'Average F1'
+print round(average_fscore*100,2)
 print evaluation.confusionMatrix(test_labels, predicted_classes, True, True)
 
 # classifier_probabilities = c.predict_proba(predicted_classes)
