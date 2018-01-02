@@ -4,9 +4,9 @@ import time
 import cPickle
 
 from datetime import datetime
-from sklearn import metrics
+
+import os
 from sklearn.model_selection import GridSearchCV, KFold
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn import svm
 from sklearn.preprocessing import StandardScaler
@@ -42,20 +42,17 @@ param_grid = {
 grid = GridSearchCV(pipe, cv=3, n_jobs=1, param_grid=param_grid, scoring='accuracy') #cv=KFold(n_splits=3,random_state=0)
 grid.fit(train_images_filenames, train_labels)
 
-with gzip.open('grid_'+str(datetime.now())+'.pklz', 'wb') as f:
-    print 'Dumping grid in ' + 'grid'+str(time.clock())+'.pklz'
+if not os.path.exists('grids'):
+    os.makedirs('grids')
+with gzip.open('grids/grid_'+str(datetime.now())+'.pklz', 'wb') as f:
+    print 'Dumping grid in ' + 'grids/grid_'+str(datetime.now())+'.pklz'
     cPickle.dump(grid, f, cPickle.HIGHEST_PROTOCOL)
 
 for i in range(len(grid.cv_results_['mean_test_score'])):
-    print str(grid.cv_results_['params'][i]) + ' -> ' + str(grid.cv_results_['mean_test_score'][i])
+    print str(grid.cv_results_['params'][i]) + ' -> ' + str(100 * grid.cv_results_['mean_test_score'][i]) + '%'
 
 print 'Best score: ' + str(grid.best_score_)
 print 'Best params: ' + str(grid.best_params_)
-
-#pipe.fit(train_images_filenames, train_labels)
-#pred = pipe.predict(test_images_filenames)
-
-#print 'Final accuracy: ' + str(100 * metrics.accuracy_score(test_labels, pred))
 
 end = time.time()
 print 'Everything done in ' + str(end - start) + ' secs.'

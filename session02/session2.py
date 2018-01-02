@@ -30,7 +30,7 @@ pipe = Pipeline([
 pipe.fit(train_images_filenames, train_labels)
 pred = pipe.predict(test_images_filenames)
 
-print 'Final accuracy: ' + str(100 * metrics.accuracy_score(test_labels, pred))
+print 'Final accuracy: ' + str(100 * metrics.accuracy_score(test_labels, pred)) + '%'
 
 end = time.time()
 print 'Everything done in ' + str(end - start) + ' secs.'
