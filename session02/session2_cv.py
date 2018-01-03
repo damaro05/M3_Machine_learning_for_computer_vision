@@ -34,10 +34,10 @@ pipe = Pipeline([
 ])
 
 param_grid = {
-    'sift__nfeatures': [300, 600],
-    'spatial_pyramids__K': [256, 512],
+    'sift__nfeatures': [300],
+    'spatial_pyramids__K': [128, 256, 512],
     'spatial_pyramids__num_levels': [2, 3],
-    'svm__C': [.5, 1, 4],
+    'svm__C': [4, 7, 10],
     'svm__gamma': [.002]
 }
 
@@ -46,7 +46,7 @@ grid.fit(train_images_filenames, train_labels)
 
 if not os.path.exists('grids'):
     os.makedirs('grids')
-with gzip.open('grids/grid_'+str(datetime.now())+'.pklz', 'wb') as f:
+with gzip.open('grids/grid_'+str(datetime.now()).replace(':','-')+'.pklz', 'wb') as f:
     print 'Dumping grid in ' + 'grids/grid_'+str(datetime.now())+'.pklz'
     cPickle.dump(grid, f, cPickle.HIGHEST_PROTOCOL)
 
