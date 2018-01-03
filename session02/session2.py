@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler
 import data_loader
 from bovw import BoVWextractor
 from sift import SIFTextractor
+from spatial_pyramids import SpatialPyramids
 
 start = time.time()
 

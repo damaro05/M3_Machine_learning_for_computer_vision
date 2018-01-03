@@ -14,6 +14,7 @@ from sklearn.preprocessing import StandardScaler
 import data_loader
 from bovw import BoVWextractor
 from sift import SIFTextractor
+from spatial_pyramids import SpatialPyramids
 
 start = time.time()
 
@@ -27,19 +28,20 @@ print('Loaded ' + str(len(test_images_filenames)) + ' testing images filenames w
 
 pipe = Pipeline([
     ('sift', SIFTextractor()),
-    ('bovw', BoVWextractor()),
+    ('spatial_pyramids', SpatialPyramids()),
     ('scaler', StandardScaler()),
     ('svm', svm.SVC(kernel='rbf')),
 ])
 
 param_grid = {
-    'sift__nfeatures': [300],
-    'bovw__K': [512, 1024],
-    'svm__C': [1, 2],
+    'sift__nfeatures': [300, 600],
+    'spatial_pyramids__K': [256, 512],
+    'spatial_pyramids__num_levels': [2, 3],
+    'svm__C': [.5, 1, 4],
     'svm__gamma': [.002]
 }
 
-grid = GridSearchCV(pipe, cv=3, n_jobs=1, param_grid=param_grid, scoring='accuracy') #cv=KFold(n_splits=3,random_state=0)
+grid = GridSearchCV(pipe, cv=3, n_jobs=1, param_grid=param_grid, scoring='accuracy',verbose=3)
 grid.fit(train_images_filenames, train_labels)
 
 if not os.path.exists('grids'):
