@@ -15,9 +15,12 @@ class SIFTextractor(BaseEstimator):
         self.nfeatures = nfeatures
         self.picklepath = picklepath
         self.force_reload = force_reload
-        self._dumpfile = 'SIFT_features_' + str(nfeatures)
-        self.no_dump = no_dump
         self.dense = dense
+        if not self.dense:
+            self._dumpfile = 'SIFT_features_' + str(nfeatures)
+        else:
+            self._dumpfile = 'SIFT_dense_features_' + str(nfeatures)
+        self.no_dump = no_dump
         self.options = options
 
     def fit(self, X, y=None):
