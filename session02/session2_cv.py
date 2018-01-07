@@ -15,6 +15,7 @@ import data_loader
 from bovw import BoVWextractor
 from sift import SIFTextractor
 from spatial_pyramids import SpatialPyramids
+import svm_custom_kernels
 
 start = time.time()
 
@@ -30,12 +31,12 @@ pipe = Pipeline([
     ('sift', SIFTextractor()),
     ('spatial_pyramids', SpatialPyramids()),
     ('scaler', StandardScaler()),
-    ('svm', svm.SVC(kernel='rbf')),
+    ('svm', svm.SVC(kernel=svm_custom_kernels.intersection_kernel)),
 ])
 
 param_grid = {
     'sift__nfeatures': [300],
-    'spatial_pyramids__K': [128, 256, 512],
+    'spatial_pyramids__K': [64, 128, 256, 512],
     'spatial_pyramids__num_levels': [2, 3],
     'svm__C': [4, 7, 10],
     'svm__gamma': [.002]

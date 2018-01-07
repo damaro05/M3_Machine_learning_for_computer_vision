@@ -1,7 +1,7 @@
 import gzip
 import cPickle
 
-filename = 'grid_2018-01-03 16-35-32.620042.pklz'
+filename = 'grid_2018-01-07 18-58-56.416684.pklz'
 
 path='grids'
 with gzip.open(path+'/'+filename) as f:
@@ -21,4 +21,7 @@ Spatial Pyramids:
 grid_2018-01-03 13-13-59.576644.pklz
 grid_2018-01-03 16-14-52.871637.pklz
 grid_2018-01-03 16-35-32.620042.pklz
+
+Intersection Kernel + Spatial Pyramids:
+grid_2018-01-07 18-58-56.416684.pklz
 '''
