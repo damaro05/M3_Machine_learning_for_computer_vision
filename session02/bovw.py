@@ -5,13 +5,14 @@ from codebook import Codebook
 
 
 class BoVWextractor(BaseEstimator):
-    def __init__(self, K=512, no_dump_codebook=False):
+    def __init__(self, K=512, no_dump_codebook=False, force_reload=False):
         self.K = K
         self.no_dump_codebook=no_dump_codebook
+        self.force_reload = force_reload
 
     def fit(self, X, y=None):
         # Compute the codebook
-        self.codebook = Codebook(K=self.K,no_dump=self.no_dump_codebook)
+        self.codebook = Codebook(K=self.K,no_dump=self.no_dump_codebook, force_reload=self.force_reload)
         self.codebook.fit(X['descriptors'])
         return self
 

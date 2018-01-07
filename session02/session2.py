@@ -8,18 +8,13 @@ import data_loader
 from bovw import BoVWextractor
 from sift import SIFTextractor
 from spatial_pyramids import SpatialPyramids
+from dense_sift import DenseSIFTextractor
 
 import svm_custom_kernels as ck
 
 #######################
 custom_kernel = False
 
-# SIFT options
-sift_dense = True
-sift_options = {}
-sift_options['max_nr_keyp'] = 1500	# Max number of equally spaced keypoints
-sift_options['keyp_step'] = 10		# Step size
-sift_options['keyp_radius'] = 5		# Radius size
 #######################
 
 start = time.time()
@@ -34,14 +29,14 @@ print('Loaded ' + str(len(test_images_filenames)) + ' testing images filenames w
 
 kernel = 'rbf'
 if custom_kernel:
-	kernel = ck.intersection_kernel
+    kernel = ck.intersection_kernel
 
 # Definition of the pipeline
 pipe = Pipeline([
-    ('sift', SIFTextractor(nfeatures=300, dense=sift_dense, options=sift_options)),
+    ('sift', DenseSIFTextractor(step=10, radius=5, max_nr_keypoints=1500)),
     ('bovw', BoVWextractor(K=512)),
     ('scaler', StandardScaler()),
-    ('svm', svm.SVC(kernel=kernel, C=1, gamma=.002)),
+    ('svm', svm.SVC(kernel=kernel, C=4, gamma=.002)),
 ])
 
 # Learning and classifying

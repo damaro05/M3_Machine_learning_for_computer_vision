@@ -9,19 +9,21 @@ import numpy as np
 import pickle
 
 
-class SIFTextractor(BaseEstimator):
-    def __init__(self, nfeatures=300, picklepath='../../FeaturePickles', force_reload=False, no_dump=False):
-        self.nfeatures = nfeatures
+class DenseSIFTextractor(BaseEstimator):
+    def __init__(self, max_nr_keypoints=1500, step=10, radius=5, picklepath='../../FeaturePickles', force_reload=False, no_dump=False):
+        self.max_nr_keypoints = max_nr_keypoints
+        self.step = 10
+        self.radius = 5
         self.picklepath = picklepath
         self.force_reload = force_reload
-        self._dumpfile = 'SIFT_features_' + str(nfeatures)
+        self._dumpfile = 'SIFT_dense_features_' + str(step)+'_'+str(radius)
         self.no_dump = no_dump
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, images_filenames):
-        print 'Getting the SIFT features'
+        print 'Getting the dense SIFT features'
         init = time.time()
 
         # Load precomputed data if avaliable
@@ -37,7 +39,7 @@ class SIFTextractor(BaseEstimator):
                 return descriptors_per_image
 
         # Extract SIFT keypoints and descriptors for each image
-        SIFTdetector = cv2.xfeatures2d.SIFT_create(nfeatures=self.nfeatures)
+        SIFTdetector = cv2.xfeatures2d.SIFT_create()
         descriptors_per_image = []
         kptpositions_per_image = []
         image_sizes = []
@@ -46,7 +48,10 @@ class SIFTextractor(BaseEstimator):
             # print 'Reading image ' + filename
             ima = cv2.imread(filename)
             gray = cv2.cvtColor(ima, cv2.COLOR_BGR2GRAY)
-            kpt, des = SIFTdetector.detectAndCompute(gray, None)
+            # Check Dense sampling
+            kpt = self.dense_sampling(self.max_nr_keypoints, self.step, self.radius, \
+                                 gray.shape[0], gray.shape[1])
+            kpt, des = SIFTdetector.compute(gray, kpt)
             pos = [auxkpt.pt for auxkpt in kpt]
             descriptors_per_image.append(des)
             kptpositions_per_image.append(np.array(pos))
@@ -68,3 +73,20 @@ class SIFTextractor(BaseEstimator):
         end = time.time()
         print '\tDone in ' + str(end - init) + ' secs.'
         return data
+
+    def dense_sampling(self, max_nr_keypoints, step_size, radius, image_height, image_width):
+        nr_keypoints = (image_height/step_size)*(image_width/step_size)
+        while not nr_keypoints <= max_nr_keypoints:
+            step_size = step_size - 1
+            if step_size < 1:
+                step_size = 1
+                nr_keypoints = (image_height / step_size) * (image_width / step_size)
+                break
+
+        if step_size < 1:
+            step_size = 1
+
+        kpt = [cv2.KeyPoint(x, y, radius) for y in range(step_size-1, image_height-step_size, step_size)
+                                        for x in range(step_size-1, image_width-step_size, step_size)]
+
+        return kpt
