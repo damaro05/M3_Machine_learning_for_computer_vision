@@ -24,4 +24,7 @@ grid_2018-01-03 16-35-32.620042.pklz
 
 Intersection Kernel + Spatial Pyramids:
 grid_2018-01-07 18-58-56.416684.pklz
+
+Dense SIFT + Intersection Kernel + Spatial Pyramids:
+grid_2018-01-08 00-25-25.986099.pklz
 '''
