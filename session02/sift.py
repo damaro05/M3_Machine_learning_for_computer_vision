@@ -10,13 +10,15 @@ import pickle
 
 
 class SIFTextractor(BaseEstimator):
-    def __init__(self, nfeatures=300, picklepath='../../FeaturePickles', force_reload=False, no_dump=False):
+    def __init__(self, nfeatures=300, picklepath='../../FeaturePickles', force_reload=False, no_dump=False, dense=False, options={}):
         # Dense sift: SIFTdetector.compute(image,keypoints)
         self.nfeatures = nfeatures
         self.picklepath = picklepath
         self.force_reload = force_reload
         self._dumpfile = 'SIFT_features_' + str(nfeatures)
         self.no_dump = no_dump
+        self.dense = dense
+        self.options = options
 
     def fit(self, X, y=None):
         return self
@@ -47,7 +49,13 @@ class SIFTextractor(BaseEstimator):
             # print 'Reading image ' + filename
             ima = cv2.imread(filename)
             gray = cv2.cvtColor(ima, cv2.COLOR_BGR2GRAY)
-            kpt, des = SIFTdetector.detectAndCompute(gray, None)
+            # Check Dense sampling
+            if self.dense:
+                kpt = self.dense_sampling(self.options['max_nr_keyp'], self.options['keyp_step'], self.options['keyp_radius'], \
+                                     gray.shape[0], gray.shape[1])
+                kpt, des = SIFTdetector.compute(gray, kpt)
+            else:
+                kpt, des = SIFTdetector.detectAndCompute(gray, None)
             pos = [auxkpt.pt for auxkpt in kpt]
             descriptors_per_image.append(des)
             kptpositions_per_image.append(np.array(pos))
@@ -69,3 +77,20 @@ class SIFTextractor(BaseEstimator):
         end = time.time()
         print '\tDone in ' + str(end - init) + ' secs.'
         return data
+
+    def dense_sampling(self, max_nr_keypoints, step_size, radius, image_height, image_width):
+        nr_keypoints = (image_height/step_size)*(image_width/step_size)
+        while not nr_keypoints <= max_nr_keypoints:
+            step_size = step_size - 1
+            if step_size < 1:
+                step_size = 1
+                nr_keypoints = (image_height / step_size) * (image_width / step_size)
+                break
+
+        if step_size < 1:
+            step_size = 1
+
+        kpt = [cv2.KeyPoint(x, y, radius) for y in range(step_size-1, image_height-step_size, step_size)
+                                        for x in range(step_size-1, image_width-step_size, step_size)]
+
+        return kpt
