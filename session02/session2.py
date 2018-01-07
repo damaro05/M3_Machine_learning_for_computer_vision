@@ -12,7 +12,14 @@ from spatial_pyramids import SpatialPyramids
 import svm_custom_kernels as ck
 
 #######################
-custom_kernel = True
+custom_kernel = False
+
+# SIFT options
+sift_dense = True
+sift_options = {}
+sift_options['max_nr_keyp'] = 1500	# Max number of equally spaced keypoints
+sift_options['keyp_step'] = 10		# Step size
+sift_options['keyp_radius'] = 5		# Radius size
 #######################
 
 start = time.time()
@@ -31,7 +38,7 @@ if custom_kernel:
 
 # Definition of the pipeline
 pipe = Pipeline([
-    ('sift', SIFTextractor(nfeatures=300)),
+    ('sift', SIFTextractor(nfeatures=300, dense=sift_dense, options=sift_options)),
     ('bovw', BoVWextractor(K=512)),
     ('scaler', StandardScaler()),
     ('svm', svm.SVC(kernel=kernel, C=1, gamma=.002)),
