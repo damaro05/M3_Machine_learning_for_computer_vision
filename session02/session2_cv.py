@@ -16,6 +16,7 @@ from bovw import BoVWextractor
 from sift import SIFTextractor
 from spatial_pyramids import SpatialPyramids
 import svm_custom_kernels
+from dense_sift import DenseSIFTextractor
 
 start = time.time()
 
@@ -28,17 +29,18 @@ print('Loaded ' + str(len(train_images_filenames)) + ' training images filenames
 print('Loaded ' + str(len(test_images_filenames)) + ' testing images filenames with classes ', set(test_labels))
 
 pipe = Pipeline([
-    ('sift', SIFTextractor()),
+    ('sift', DenseSIFTextractor()),
     ('spatial_pyramids', SpatialPyramids()),
     ('scaler', StandardScaler()),
     ('svm', svm.SVC(kernel=svm_custom_kernels.intersection_kernel)),
 ])
 
 param_grid = {
-    'sift__nfeatures': [300],
-    'spatial_pyramids__K': [64, 128, 256, 512],
+    'sift__step': [10],
+    'sift__radius': [5],
+    'spatial_pyramids__K': [128, 256],
     'spatial_pyramids__num_levels': [2, 3],
-    'svm__C': [4, 7, 10],
+    'svm__C': [4, 7],
     'svm__gamma': [.002]
 }
 
