@@ -7,10 +7,8 @@ from keras.preprocessing.image import ImageDataGenerator
 #user defined variables
 PATCH_SIZE  = 64
 BATCH_SIZE  = 16
-#DATASET_DIR = '/share/datasets/MIT_split'
-DATASET_DIR = '/Users/leki/Code/Module 3/Databases/MIT_split'
-#PATCHES_DIR = '/home/master04/data/MIT_split_patches'
-PATCHES_DIR = '/Users/leki/Code/Module 3/data/'
+DATASET_DIR = '/share/datasets/MIT_split'
+PATCHES_DIR = '/home/master04/data/MIT_split_patches'
 MODEL_FNAME = 'patch_based_mlp.h5'
 
 def build_mlp(input_size=PATCH_SIZE,phase='TRAIN'):
