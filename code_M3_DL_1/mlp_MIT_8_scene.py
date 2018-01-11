@@ -12,7 +12,7 @@ start = time.clock()
 # user defined variables
 IMG_SIZE = 32
 BATCH_SIZE = 16
-DATASET_DIR = '/Users/leki/Code/Module 3/Databases/MIT_split'
+DATASET_DIR = '/share/datasets/MIT_split'
 MODEL_FNAME = 'my_first_mlp.h5'
 
 if not os.path.exists(DATASET_DIR):
