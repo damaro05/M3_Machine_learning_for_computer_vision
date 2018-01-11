@@ -7,8 +7,10 @@ from keras.preprocessing.image import ImageDataGenerator
 #user defined variables
 PATCH_SIZE  = 64
 BATCH_SIZE  = 16
-DATASET_DIR = '/share/datasets/MIT_split'
-PATCHES_DIR = '/home/master04/data/MIT_split_patches'
+#DATASET_DIR = '/share/datasets/MIT_split'
+DATASET_DIR = '/Users/leki/Code/Module 3/Databases/MIT_split'
+#PATCHES_DIR = '/home/master04/data/MIT_split_patches'
+PATCHES_DIR = '/Users/leki/Code/Module 3/data/'
 MODEL_FNAME = 'patch_based_mlp.h5'
 
 def build_mlp(input_size=PATCH_SIZE,phase='TRAIN'):
@@ -114,7 +116,7 @@ for class_dir in os.listdir(directory):
     cls = classes[class_dir]
     for imname in os.listdir(os.path.join(directory,class_dir)):
       im = Image.open(os.path.join(directory,class_dir,imname))
-      patches = image.extract_patches_2d(np.array(im), (PATCH_SIZE, PATCH_SIZE))#, max_patches=1.0)
+      patches = image.extract_patches_2d(np.array(im), (PATCH_SIZE, PATCH_SIZE))#, max_patches=0.9999)
       out = model.predict(patches/255.)
       predicted_cls = np.argmax( softmax(np.mean(out,axis=0)) )
       if predicted_cls == cls:
