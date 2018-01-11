@@ -4,6 +4,8 @@ from keras.models import Sequential
 from keras.layers import Flatten, Dense, Reshape
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import plot_model
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import time
 
