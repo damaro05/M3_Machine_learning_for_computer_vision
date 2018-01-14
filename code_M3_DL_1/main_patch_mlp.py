@@ -12,14 +12,14 @@ from sklearn.metrics import accuracy_score
 
 from patches.patch_data_loader import build_patch_generator
 from patches.patch_mlp_builder import build_patch_mlp
-from utils import colorprint, Color, softmax, generate_image_patches_db
+from utils import colorprint, Color, softmax, generate_image_patches_db, plot_history
 import os
 
 ## PARAMETERS ##########################################################################################################
 PATCH_SIZE = 64
-BATCH_SIZE = 16
-EPOCHS = 150
+EPOCHS = 50
 MAX_PATCHES = 64
+BATCH_SIZE = MAX_PATCHES * 16
 DATASET_DIR = '/share/datasets/MIT_split'
 PATCHES_DIR = '/home/master04/data/MIT_split_patches_' + str(PATCH_SIZE)
 CLASSES = ['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding']
@@ -92,9 +92,9 @@ else:
             cPickle.HIGHEST_PROTOCOL)
 
     # summarize history for accuracy
-    # plot_history(history, model_identifier, metric='acc', plot_validation=TRAIN_WITH_VALIDATION, path='dump/patch_histories/')
+    plot_history(history, model_identifier, metric='acc', plot_validation=TRAIN_WITH_VALIDATION, path='dump/patch_histories/')
     # summarize history for loss
-    # plot_history(history, model_identifier, metric='loss', plot_validation=TRAIN_WITH_VALIDATION, path='dump/patch_histories/')
+    plot_history(history, model_identifier, metric='loss', plot_validation=TRAIN_WITH_VALIDATION, path='dump/patch_histories/')
 
 # Test the model
 colorprint(Color.BLUE, 'Start testing...\n')

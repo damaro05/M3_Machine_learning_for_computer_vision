@@ -80,5 +80,5 @@ def plot_history(history, model_identifier, metric='acc', plot_validation=False,
     else:
         legend = ['train']
     plt.legend(legend, loc='upper left')
-    plt.savefig(path+'/'+model_identifier + '_' + metric + '.jpg')
+    plt.savefig(path+'/'+model_identifier + '_' + metric + '.png')
     plt.close()

@@ -18,14 +18,14 @@ from sklearn.feature_extraction.image import extract_patches_2d
 from sklearn.metrics import accuracy_score
 
 from patches.patch_data_loader import build_patch_generator
-from utils import colorprint, Color, softmax, generate_image_patches_db
+from utils import colorprint, Color, softmax, generate_image_patches_db, plot_history
 import os
 
 ## PARAMETERS ##########################################################################################################
 PATCH_SIZE = 64
-BATCH_SIZE = 16
 EPOCHS = 50
 MAX_PATCHES = 64
+BATCH_SIZE = MAX_PATCHES * 16
 LAYER = 'second'
 K = 512
 DATASET_DIR = '/share/datasets/MIT_split'
@@ -100,9 +100,9 @@ else:
             cPickle.HIGHEST_PROTOCOL)
 
     # summarize history for accuracy
-    # plot_history(history, model_identifier, metric='acc', plot_validation=TRAIN_WITH_VALIDATION, path='dump/patch_histories/')
+    plot_history(history, model_identifier, metric='acc', plot_validation=TRAIN_WITH_VALIDATION, path='dump/patch_histories/')
     # summarize history for loss
-    # plot_history(history, model_identifier, metric='loss', plot_validation=TRAIN_WITH_VALIDATION, path='dump/patch_histories/')
+    plot_history(history, model_identifier, metric='loss', plot_validation=TRAIN_WITH_VALIDATION, path='dump/patch_histories/')
 
 colorprint(Color.BLUE, 'Start generating BoVW representation...\n')
 start = time.clock()
