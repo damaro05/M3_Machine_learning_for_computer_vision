@@ -16,7 +16,7 @@ from full_image.data_loader import build_generator
 ## PARAMETERS ##########################################################################################################
 IMG_SIZE = 32
 BATCH_SIZE = 32
-EPOCHS = 150
+EPOCHS = 250
 DATASET_DIR = '/share/datasets/MIT_split'
 CLASSES = ['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding']
 RECOMPUTE = False
