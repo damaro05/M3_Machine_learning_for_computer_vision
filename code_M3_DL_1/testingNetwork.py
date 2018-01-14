@@ -11,7 +11,7 @@ BATCH_SIZE  = 16
 DATASET_DIR = '/Users/damaro/Desktop/M.Computer Vision/M3.Machine learning/Practices/Databases/MIT_split'
 MODEL_FNAME = 'TestingNetwork.h5'
 
-EPOCHS = 50
+EPOCHS = 150
 input_shape = (IMG_SIZE, IMG_SIZE, 3)
 
 if not os.path.exists(DATASET_DIR):
@@ -50,7 +50,7 @@ model.add(Dense(8, activation='softmax'))
 #model.add(Dense(units=8, activation='softmax'))
 
 model.compile(loss='categorical_crossentropy',
-              optimizer='rmsprop',
+              optimizer='sgd',
               metrics=['accuracy'])
 
 print(model.summary())
