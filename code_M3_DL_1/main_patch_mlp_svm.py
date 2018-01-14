@@ -22,10 +22,10 @@ from utils import colorprint, Color, softmax, generate_image_patches_db, plot_hi
 import os
 
 ## PARAMETERS ##########################################################################################################
-PATCH_SIZE = 64
+PATCH_SIZE = 48
 EPOCHS = 50
-MAX_PATCHES = 64
-BATCH_SIZE = MAX_PATCHES * 16
+MAX_PATCHES = 32
+BATCH_SIZE = MAX_PATCHES * 32
 LAYER = 'second'
 K = 512
 DATASET_DIR = '/share/datasets/MIT_split'
