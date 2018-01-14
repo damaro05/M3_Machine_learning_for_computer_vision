@@ -1,4 +1,5 @@
 import matplotlib
+from keras.preprocessing.image import ImageDataGenerator
 
 matplotlib.use('Agg')
 import time
@@ -19,7 +20,7 @@ BATCH_SIZE = 32
 EPOCHS = 150
 DATASET_DIR = '/share/datasets/MIT_split'
 CLASSES = ['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding']
-RECOMPUTE = True
+RECOMPUTE = False
 TRAIN_WITH_VALIDATION = True
 ########################################################################################################################
 
@@ -94,11 +95,20 @@ else:
 
 colorprint(Color.BLUE, 'Start testing...\n')
 start = time.clock()
-
-X, y = load_dataset(DATASET_DIR, SPLIT='test', IMG_RESIZE=(IMG_SIZE, IMG_SIZE))
+'''
+X, y = load_dataset(DATASET_DIR, SPLIT='test', IMG_RESIZE=(IMG_SIZE, IMG_SIZE), classes=CLASSES)
 
 pred = np.array(CLASSES)[np.argmax(model.predict(np.array(X)), axis=1)]
 accuracy = accuracy_score(y,pred)
+
+'''
+test_generator = build_generator(DATASET_DIR, IMG_SIZE, BATCH_SIZE, SPLIT='test', CLASSES=CLASSES)
+y = np.array(CLASSES)[test_generator.classes]
+
+pred = np.array(CLASSES)[np.argmax(model.predict_generator(test_generator), axis=1)]
+accuracy = accuracy_score(y,pred)
+#accuracy = model.evaluate_generator(test_generator)[model.metrics_names.index('acc')]
+
 end = time.clock()
 colorprint(Color.BLUE, 'Done! Elapsed time: ' + str(end - start) + 'sec\n')
 
