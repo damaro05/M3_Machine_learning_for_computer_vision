@@ -21,7 +21,7 @@ BATCH_SIZE = 16
 EPOCHS = 150
 MAX_PATCHES = 64
 DATASET_DIR = '/share/datasets/MIT_split'
-PATCHES_DIR = '/Users/leki/Code/Module 3/Databases/MIT_split_patches_64'#'/home/master04/data/MIT_split_patches_16'
+PATCHES_DIR = '/home/master04/data/MIT_split_patches_' + str(PATCH_SIZE)
 CLASSES = ['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding']
 RECOMPUTE = False
 TRAIN_WITH_VALIDATION = True
@@ -36,7 +36,7 @@ if not os.path.exists(DATASET_DIR):
 if not os.path.exists(PATCHES_DIR):
     colorprint(Color.YELLOW, 'WARNING: patches dataset directory ' + PATCHES_DIR + ' do not exists!\n')
     colorprint(Color.BLUE, 'Creating image patches dataset into ' + PATCHES_DIR + '\n')
-    generate_image_patches_db(DATASET_DIR, PATCHES_DIR, patch_size=PATCH_SIZE,max_patches=MAX_PATCHES)
+    generate_image_patches_db(DATASET_DIR, PATCHES_DIR, patch_size=PATCH_SIZE, max_patches=MAX_PATCHES)
     colorprint(Color.BLUE, 'Done!\n')
 
 # Build the NN
@@ -73,10 +73,10 @@ else:
 
     history = model.fit_generator(
         train_generator,
-        steps_per_epoch=10,#train_generator.samples // BATCH_SIZE,
+        steps_per_epoch=train_generator.samples // BATCH_SIZE,
         epochs=EPOCHS,
         validation_data=validation_generator,
-        validation_steps=10)#validation_steps)
+        validation_steps=validation_steps)
 
     end = time.clock()
     colorprint(Color.BLUE, 'Done! Elapsed time: ' + str(end - start) + 'sec\n')
