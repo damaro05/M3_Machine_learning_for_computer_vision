@@ -12,10 +12,10 @@ from full_image.data_loader import build_generator, load_dataset
 from sklearn import svm
 
 ## PARAMETERS ##########################################################################################################
-IMG_SIZE = 64
+IMG_SIZE = 32
 BATCH_SIZE = 32
-EPOCHS = 60
-LAYER = 'third'
+EPOCHS = 150
+LAYER = 'second'
 DATASET_DIR = '/share/datasets/MIT_split'
 CLASSES = ['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding']
 RECOMPUTE = False

@@ -14,9 +14,9 @@ from full_image.mlp_builder import build_mlp
 from full_image.data_loader import build_generator
 
 ## PARAMETERS ##########################################################################################################
-IMG_SIZE = 256
-BATCH_SIZE = 16
-EPOCHS = 100
+IMG_SIZE = 32
+BATCH_SIZE = 32
+EPOCHS = 60
 DATASET_DIR = '/share/datasets/MIT_split'
 CLASSES = ['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding']
 RECOMPUTE = False
@@ -104,11 +104,15 @@ accuracy = accuracy_score(y,pred)
 test_generator = build_generator(DATASET_DIR, IMG_SIZE, BATCH_SIZE, SPLIT='test', CLASSES=CLASSES)
 y = np.array(CLASSES)[test_generator.classes]
 
-pred = np.array(CLASSES)[np.argmax(model.predict_generator(test_generator), axis=1)]
-accuracy = accuracy_score(y,pred)
-#accuracy = model.evaluate_generator(test_generator)[model.metrics_names.index('acc')]
+#pred = np.array(CLASSES)[np.argmax(model.predict_generator(test_generator), axis=1)]
+#accuracy = accuracy_score(y,pred)
+evaluation = model.evaluate_generator(test_generator)
+accuracy = evaluation[model.metrics_names.index('acc')]
+loss = evaluation[model.metrics_names.index('loss')]
 
 end = time.clock()
 colorprint(Color.BLUE, 'Done! Elapsed time: ' + str(end - start) + 'sec\n')
 
 print 'Accuracy on test: ' + str(100 * accuracy)
+print 'Loss on test: ' + str(loss)
+
