@@ -10,8 +10,8 @@ from skimage.io import imread
 from sklearn.feature_extraction.image import extract_patches_2d
 from sklearn.metrics import accuracy_score
 
-from patch_data_loader import build_patch_generator
-from patch_mlp_builder import build_patch_mlp
+from patches.patch_data_loader import build_patch_generator
+from patches.patch_mlp_builder import build_patch_mlp
 from utils import colorprint, Color, softmax, generate_image_patches_db
 import os
 
@@ -45,15 +45,15 @@ model = build_patch_mlp(PATCH_SIZE)
 # Train or load the weights
 model_identifier = str(hash(str(model.get_config()))) + '_' + str(PATCH_SIZE) + '_' + str(BATCH_SIZE) + '_' + str(
     EPOCHS) + '_' + str(MAX_PATCHES)
-if os.path.exists('patch_models/' + model_identifier + '.h5') and not RECOMPUTE:
-    model.load_weights('patch_models/' + model_identifier + '.h5')
-    colorprint(Color.GREEN, 'Loading model file patch_models/' + model_identifier + '.h5\n')
+if os.path.exists('dump/patch_models/' + model_identifier + '.h5') and not RECOMPUTE:
+    model.load_weights('dump/patch_models/' + model_identifier + '.h5')
+    colorprint(Color.GREEN, 'Loading model file dump/patch_models/' + model_identifier + '.h5\n')
 else:
-    if not os.path.exists('patch_models'):
-        os.mkdir('patch_models')
+    if not os.path.exists('dump/patch_models'):
+        os.mkdir('dump/patch_models')
     if os.path.exists(model_identifier + '.h5'):
         colorprint(Color.YELLOW,
-                   'WARNING: model file patch_models/' + model_identifier + '.h5 exists and will be overwritten!\n')
+                   'WARNING: model file dump/patch_models/' + model_identifier + '.h5 exists and will be overwritten!\n')
 
     # this is a generator that will read pictures found in
     # subfolers of 'data/train', and indefinitely generate
@@ -82,26 +82,26 @@ else:
     colorprint(Color.BLUE, 'Done! Elapsed time: ' + str(end - start) + 'sec\n')
     colorprint(Color.BLUE, 'Saving the model into ' + model_identifier + '.h5 \n')
     model.save_weights(
-        'patch_models/' + model_identifier + '.h5')  # always save your weights after training or during training
+        'dump/patch_models/' + model_identifier + '.h5')  # always save your weights after training or during training
     colorprint(Color.BLUE, 'Done!\n')
-    if not os.path.exists('patch_histories'):
-        os.mkdir('patch_histories')
-    with open('patch_histories/' + model_identifier + '_history.pklz', 'wb') as f:
+    if not os.path.exists('dump/patch_histories'):
+        os.mkdir('dump/patch_histories')
+    with open('dump/patch_histories/' + model_identifier + '_history.pklz', 'wb') as f:
         cPickle.dump(
             (history.epoch, history.history, history.params, history.validation_data, model.get_config()), f,
             cPickle.HIGHEST_PROTOCOL)
 
     # summarize history for accuracy
-    # plot_history(history, model_identifier, metric='acc', plot_validation=TRAIN_WITH_VALIDATION, path='histories')
+    # plot_history(history, model_identifier, metric='acc', plot_validation=TRAIN_WITH_VALIDATION, path='dump/patch_histories/')
     # summarize history for loss
-    # plot_history(history, model_identifier, metric='loss', plot_validation=TRAIN_WITH_VALIDATION, path='histories')
+    # plot_history(history, model_identifier, metric='loss', plot_validation=TRAIN_WITH_VALIDATION, path='dump/patch_histories/')
 
 # Test the model
 colorprint(Color.BLUE, 'Start testing...\n')
 start = time.clock()
 
 test_model = build_patch_mlp(PATCH_SIZE, phase='TEST')
-test_model.load_weights('patch_models/' + model_identifier + '.h5')
+test_model.load_weights('dump/patch_models/' + model_identifier + '.h5')
 
 CLASSES = np.array(CLASSES)
 

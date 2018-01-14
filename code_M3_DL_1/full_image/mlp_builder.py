@@ -21,9 +21,9 @@ def build_mlp(IMG_SIZE):
                   metrics=['accuracy'])
 
     model.summary()
-    if not os.path.exists('models'):
-        os.mkdir('models')
-    plot_model(model, to_file='models/' + str(hash(str(model.get_config()))) + '.png', show_shapes=True,
+    if not os.path.exists('dump/models'):
+        os.mkdir('dump/models')
+    plot_model(model, to_file='dump/models/' + str(hash(str(model.get_config()))) + '.png', show_shapes=True,
                show_layer_names=True)
 
     colorprint(Color.BLUE, 'Done!\n')
@@ -44,9 +44,9 @@ def build_mlp_svm(IMG_SIZE):
                   metrics=['accuracy'])
 
     model.summary()
-    if not os.path.exists('models'):
-        os.mkdir('models')
-    plot_model(model, to_file='models/' + str(hash(str(model.get_config()))) + '.png', show_shapes=True,
+    if not os.path.exists('dump/models'):
+        os.mkdir('dump/models')
+    plot_model(model, to_file='dump/models/' + str(hash(str(model.get_config()))) + '.png', show_shapes=True,
                show_layer_names=True)
 
     colorprint(Color.BLUE, 'Done!\n')

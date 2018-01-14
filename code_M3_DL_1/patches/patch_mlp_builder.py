@@ -23,9 +23,9 @@ def build_patch_mlp(PATCH_SIZE,phase='TRAIN'):
                   metrics=['accuracy'])
 
     model.summary()
-    if not os.path.exists('patch_models'):
-        os.mkdir('patch_models')
-    plot_model(model, to_file='patch_models/' + str(hash(str(model.get_config()))) + '.png', show_shapes=True,
+    if not os.path.exists('dump/patch_models'):
+        os.mkdir('dump/patch_models')
+    plot_model(model, to_file='dump/patch_models/' + str(hash(str(model.get_config()))) + '.png', show_shapes=True,
                show_layer_names=True)
 
     colorprint(Color.BLUE, 'Done!\n')
