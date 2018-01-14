@@ -16,10 +16,10 @@ from utils import colorprint, Color, softmax, generate_image_patches_db, plot_hi
 import os
 
 ## PARAMETERS ##########################################################################################################
-PATCH_SIZE = 64
+PATCH_SIZE = 48
 EPOCHS = 50
-MAX_PATCHES = 64
-BATCH_SIZE = MAX_PATCHES * 16
+MAX_PATCHES = 32
+BATCH_SIZE = MAX_PATCHES * 32
 DATASET_DIR = '/share/datasets/MIT_split'
 PATCHES_DIR = '/home/master04/data/MIT_split_patches_' + str(PATCH_SIZE)
 CLASSES = ['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding']
