@@ -13,12 +13,14 @@ def build_generator(DATASET_DIR, IMG_SIZE, BATCH_SIZE, SPLIT,CLASSES):
         width_shift_range = 0.1
         height_shift_range = 0.1
         zoom_range=0.1
+        shuffle=True
     elif SPLIT == 'test':
         horizontal_flip = False
         rotation_range = 0
         width_shift_range = 0
         height_shift_range = 0
         zoom_range = 0
+        shuffle=False
     else:
         print('ERROR: SPLIT must be \'train\' or \'test\'')
         exit(-1)
@@ -39,11 +41,13 @@ def build_generator(DATASET_DIR, IMG_SIZE, BATCH_SIZE, SPLIT,CLASSES):
         target_size=(IMG_SIZE, IMG_SIZE),  # all images will be resized to IMG_SIZExIMG_SIZE
         batch_size=BATCH_SIZE,
         classes=CLASSES,
-        class_mode='categorical')  # since we use binary_crossentropy loss, we need categorical labels
+        class_mode='categorical',
+        shuffle=shuffle)  # since we use binary_crossentropy loss, we need categorical labels
     return generator
 
-def load_dataset(DATASET_DIR, SPLIT, IMG_RESIZE=None):
-    classes = os.listdir(os.path.join(DATASET_DIR, SPLIT))
+def load_dataset(DATASET_DIR, SPLIT, IMG_RESIZE=None, classes=None):
+    if classes==None:
+        classes = os.listdir(os.path.join(DATASET_DIR, SPLIT))
     y = []
     X = []
     for cls in classes:
