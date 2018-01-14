@@ -14,9 +14,9 @@ from full_image.mlp_builder import build_mlp
 from full_image.data_loader import build_generator
 
 ## PARAMETERS ##########################################################################################################
-IMG_SIZE = 32
+IMG_SIZE = 256
 BATCH_SIZE = 32
-EPOCHS = 250
+EPOCHS = 100
 DATASET_DIR = '/share/datasets/MIT_split'
 CLASSES = ['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding']
 RECOMPUTE = False

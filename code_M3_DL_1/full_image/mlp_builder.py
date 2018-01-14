@@ -13,7 +13,7 @@ def build_mlp(IMG_SIZE):
     model = Sequential()
     model.add(Reshape((IMG_SIZE * IMG_SIZE * 3,), input_shape=(IMG_SIZE, IMG_SIZE, 3), name='first'))
     model.add(Dense(units=2048, activation='relu', name='second'))
-    #model.add(Dense(units=512, activation='relu', name='third'))
+    model.add(Dense(units=1024, activation='relu', name='third'))
     model.add(Dense(units=8, activation='softmax'))
 
     model.compile(loss='categorical_crossentropy',
