@@ -18,8 +18,8 @@ EPOCHS = 150
 LAYER = 'second'
 DATASET_DIR = '/share/datasets/MIT_split'
 CLASSES = ['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding']
-RECOMPUTE = False
-TRAIN_WITH_VALIDATION = False
+RECOMPUTE = True
+TRAIN_WITH_VALIDATION = True
 ########################################################################################################################
 
 # Check the location of the dataset
