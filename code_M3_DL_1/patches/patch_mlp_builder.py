@@ -30,3 +30,29 @@ def build_patch_mlp(PATCH_SIZE,phase='TRAIN'):
 
     colorprint(Color.BLUE, 'Done!\n')
     return model
+
+
+def build_patch_mlp_svm(PATCH_SIZE,phase='TRAIN'):
+    colorprint(Color.BLUE, 'Building MLP Local features model...\n')
+
+    model = Sequential()
+    model.add(Reshape((PATCH_SIZE * PATCH_SIZE * 3,), input_shape=(PATCH_SIZE, PATCH_SIZE, 3)))
+    model.add(Dense(units=128, activation='relu'))
+    # model.add(Dense(units=1024, activation='relu'))
+    if phase.capitalize() == 'TEST':
+        model.add(Dense(units=8, activation='linear'))  # In test phase we softmax the average output over the image patches
+    else:
+        model.add(Dense(units=8, activation='softmax'))
+
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='sgd',
+                  metrics=['accuracy'])
+
+    model.summary()
+    if not os.path.exists('dump/patch_models'):
+        os.mkdir('dump/patch_models')
+    plot_model(model, to_file='dump/patch_models/' + str(hash(str(model.get_config()))) + '.png', show_shapes=True,
+               show_layer_names=True)
+
+    colorprint(Color.BLUE, 'Done!\n')
+    return model
