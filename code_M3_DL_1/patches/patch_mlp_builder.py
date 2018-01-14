@@ -37,7 +37,7 @@ def build_patch_mlp_svm(PATCH_SIZE,phase='TRAIN'):
 
     model = Sequential()
     model.add(Reshape((PATCH_SIZE * PATCH_SIZE * 3,), input_shape=(PATCH_SIZE, PATCH_SIZE, 3)))
-    model.add(Dense(units=128, activation='relu'))
+    model.add(Dense(units=128, activation='relu', name='second'))
     # model.add(Dense(units=1024, activation='relu'))
     if phase.capitalize() == 'TEST':
         model.add(Dense(units=8, activation='linear'))  # In test phase we softmax the average output over the image patches

@@ -24,12 +24,12 @@ import os
 ## PARAMETERS ##########################################################################################################
 PATCH_SIZE = 64
 BATCH_SIZE = 16
-EPOCHS = 150
+EPOCHS = 50
 MAX_PATCHES = 64
 LAYER = 'second'
 K = 512
 DATASET_DIR = '/share/datasets/MIT_split'
-PATCHES_DIR = '/Users/leki/Code/Module 3/Databases/MIT_split_patches_64'  # '/home/master04/data/MIT_split_patches_16'
+PATCHES_DIR = '/home/master04/data/MIT_split_patches_' + str(PATCH_SIZE)
 CLASSES = ['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding']
 RECOMPUTE = False
 TRAIN_WITH_VALIDATION = True
@@ -81,10 +81,10 @@ else:
 
     history = model.fit_generator(
         train_generator,
-        steps_per_epoch=10,  # train_generator.samples // BATCH_SIZE,
+        steps_per_epoch=train_generator.samples // BATCH_SIZE,
         epochs=EPOCHS,
         validation_data=validation_generator,
-        validation_steps=10)  # validation_steps)
+        validation_steps=validation_steps)
 
     end = time.clock()
     colorprint(Color.BLUE, 'Done! Elapsed time: ' + str(end - start) + 'sec\n')
@@ -117,7 +117,7 @@ for cls in CLASSES:
     for imname in os.listdir(os.path.join(DATASET_DIR, 'train', cls)):
         im = Image.open(os.path.join(DATASET_DIR, 'train', cls, imname))
         y_train.append(cls)
-        patches = extract_patches_2d(im, (PATCH_SIZE, PATCH_SIZE), max_patches=MAX_PATCHES)
+        patches = extract_patches_2d(np.array(im), (PATCH_SIZE, PATCH_SIZE), max_patches=MAX_PATCHES)
         out = model_layer.predict(patches)
         X_train.append(out)
 
@@ -147,7 +147,7 @@ for cls in CLASSES:
     for imname in os.listdir(os.path.join(DATASET_DIR, 'test', cls)):
         im = Image.open(os.path.join(DATASET_DIR, 'test', cls, imname))
         y_test.append(cls)
-        patches = extract_patches_2d(im, (PATCH_SIZE, PATCH_SIZE), max_patches=MAX_PATCHES)
+        patches = extract_patches_2d(np.array(im), (PATCH_SIZE, PATCH_SIZE), max_patches=MAX_PATCHES)
         out = model_layer.predict(patches)
         X_test.append(out)
 

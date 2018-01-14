@@ -13,18 +13,16 @@ class BoVWextractor(BaseEstimator):
     def fit(self, X, y=None):
         # Compute the codebook
         self.codebook = Codebook(K=self.K,no_dump=self.no_dump_codebook, force_reload=self.force_reload)
-        self.codebook.fit(X['descriptors'])
+        self.codebook.fit(X)
         return self
 
     def transform(self, X):
         print 'Getting BoVW representation'
         init = time.time()
 
-        descriptors = X['descriptors']
-
-        visual_words = np.zeros((len(descriptors), self.K), dtype=np.float32)
-        for i in xrange(len(descriptors)):
-            words = self.codebook.predict(descriptors[i])
+        visual_words = np.zeros((len(X), self.K), dtype=np.float32)
+        for i in xrange(len(X)):
+            words = self.codebook.predict(X[i])
             visual_words[i, :] = np.bincount(words, minlength=self.K)
 
         end = time.time()
