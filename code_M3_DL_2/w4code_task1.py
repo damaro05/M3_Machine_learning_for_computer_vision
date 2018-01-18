@@ -6,7 +6,7 @@ import os
 from keras.applications.vgg16 import VGG16
 from keras.preprocessing import image
 from keras.models import Model
-from keras.layers import Flatten, AveragePooling2D
+from keras.layers import Flatten, AveragePooling2D, MaxPooling2D, Conv2D
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras import backend as K
 # from keras.utils.visualize_util import plot
@@ -54,11 +54,14 @@ plot_model(base_model, to_file=os.path.join('dump', 'models', 'modelVGG16.png'),
            show_layer_names=True)
 
 # Not valid: mem alloc error
-# x = base_model.get_layer('block4_pool').output
+x = base_model.get_layer('block4_pool').output
+x = Conv2D(filters=512,kernel_size=(3,3),strides=(2,2))(x)
 
-x = base_model.get_layer('block4_conv3').output
+#x = base_model.get_layer('block4_conv3').output
 # Method 1: 7x7x512 maybe too difficult? doesn't work properly
-x = AveragePooling2D(pool_size=(4, 4), strides=(4, 4))(x)  # Strides? Size of pixel jump
+# Try with maxpool
+# See what ramon says in the email
+#x = MaxPooling2D(pool_size=(4, 4), strides=(4, 4))(x)  # Strides? Size of pixel jump
 x = Flatten()(x)
 
 # Method 2: maybe too much? only one value per channel i.e. 1x512
@@ -81,9 +84,9 @@ for layer in model.layers:
 
 # preprocessing_function=preprocess_input,
 datagen = ImageDataGenerator(featurewise_center=False,
-                             samplewise_center=False,
+                             samplewise_center=True,
                              featurewise_std_normalization=False,
-                             samplewise_std_normalization=False,
+                             samplewise_std_normalization=True,
                              preprocessing_function=preprocess_input,
                              rotation_range=0.,
                              width_shift_range=0.,

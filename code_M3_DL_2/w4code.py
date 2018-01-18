@@ -14,7 +14,7 @@ from keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 from keras.utils import plot_model
 
-os.environ["CUDA_VISIBLE_DEVICES"]="X"
+os.environ["CUDA_VISIBLE_DEVICES"]="4"
 train_data_dir = '/share/datasets/MIT_split/train'
 val_data_dir = '/share/datasets/MIT_split/test'
 test_data_dir = '/share/datasets/MIT_split/test'
@@ -66,9 +66,9 @@ for layer in model.layers:
 
 # preprocessing_function=preprocess_input,
 datagen = ImageDataGenerator(featurewise_center=False,
-                             samplewise_center=False,
+                             samplewise_center=True,
                              featurewise_std_normalization=False,
-                             samplewise_std_normalization=False,
+                             samplewise_std_normalization=True,
                              preprocessing_function=preprocess_input,
                              rotation_range=0.,
                              width_shift_range=0.,
