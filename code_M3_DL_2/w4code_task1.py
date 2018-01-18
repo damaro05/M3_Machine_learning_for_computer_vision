@@ -14,6 +14,7 @@ from keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 from keras.utils import plot_model
 
+os.environ["CUDA_VISIBLE_DEVICES"]="4"
 train_data_dir = '/share/datasets/MIT_split/train'
 val_data_dir = '/share/datasets/MIT_split/test'
 test_data_dir = '/share/datasets/MIT_split/test'
