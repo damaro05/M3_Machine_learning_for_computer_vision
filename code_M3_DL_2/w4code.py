@@ -49,13 +49,13 @@ def preprocess_input(x, dim_ordering='default'):
 
 # create the base pre-trained model
 base_model = VGG16(weights='imagenet')
-plot_model(base_model, to_file='modelVGG16a.png', show_shapes=True, show_layer_names=True)
+plot_model(base_model, to_file=os.path.join('dump', 'models','modelVGG16.png'), show_shapes=True, show_layer_names=True)
 
 x = base_model.layers[-2].output
 x = Dense(8, activation='softmax', name='predictions')(x)
 
 model = Model(inputs=base_model.input, outputs=x)
-plot_model(model, to_file='modelVGG16b.png', show_shapes=True, show_layer_names=True)
+plot_model(model, to_file=os.path.join('dump', 'models',model_identifier+'.png'), show_shapes=True, show_layer_names=True)
 for layer in base_model.layers:
     layer.trainable = False
 
