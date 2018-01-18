@@ -4,7 +4,7 @@ from keras.models import Model
 from keras.layers import Flatten
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras import backend as K
-#from keras.utils.visualize_util import plot
+# from keras.utils.visualize_util import plot
 from keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 from keras.utils import plot_model
@@ -16,7 +16,7 @@ img_width = 224
 img_height = 224
 batch_size = 32
 number_of_epoch = 20
-
+plot_history = True
 
 def preprocess_input(x, dim_ordering='default'):
     if dim_ordering == 'default':
@@ -44,11 +44,10 @@ def preprocess_input(x, dim_ordering='default'):
 base_model = VGG16(weights='imagenet')
 plot_model(base_model, to_file='modelVGG16a.png', show_shapes=True, show_layer_names=True)
 
-
 x = base_model.layers[-2].output
 x = Dense(8, activation='softmax', name='predictions')(x)
 
-model = Model(input=base_model.input, output=x)
+model = Model(inputs=base_model.input, outputs=x)
 plot_model(model, to_file='modelVGG16b.png', show_shapes=True, show_layer_names=True)
 for layer in base_model.layers:
     layer.trainable = False
@@ -91,17 +90,18 @@ validation_generator = datagen.flow_from_directory(val_data_dir,
                                                    class_mode='categorical')
 
 history = model.fit_generator(train_generator,
-                              samples_per_epoch=batch_size * (int(400 * 1881 / 1881 // batch_size) + 1),
-                              nb_epoch=number_of_epoch,
+                              steps_per_epoch=400 / batch_size + 1, #batch_size*(int(400*1881/1881//batch_size)+1)
+                              epochs=number_of_epoch,
                               validation_data=validation_generator,
-                              nb_val_samples=807)
+                              validation_steps=validation_generator.samples / batch_size)
 
+model.save_weights('base_code.h5')
 result = model.evaluate_generator(test_generator, val_samples=807)
 print result
 
 # list all data in history
 
-if False:
+if plot_history:
     # summarize history for accuracy
     plt.plot(history.history['acc'])
     plt.plot(history.history['val_acc'])
