@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 import cPickle
 import os
@@ -104,15 +105,15 @@ history = model.fit_generator(train_generator,
 if not os.path.exists('dump'):
     os.mkdir('dump')
 
-if not os.path.exists(os.path.join('dump','models')):
-    os.mkdir(os.path.join('dump','models'))
+if not os.path.exists(os.path.join('dump', 'models')):
+    os.mkdir(os.path.join('dump', 'models'))
 
-model.save_weights(os.path.join('dump','models', model_identifier + '.h5'))
+model.save_weights(os.path.join('dump', 'models', model_identifier + '.h5'))
 
-if not os.path.exists(os.path.join('dump','histories')):
-    os.mkdir(os.path.join('dump','histories'))
+if not os.path.exists(os.path.join('dump', 'histories')):
+    os.mkdir(os.path.join('dump', 'histories'))
 
-with open(os.path.join('dump','histories', model_identifier + '_history.pklz'), 'wb') as f:
+with open(os.path.join('dump', 'histories', model_identifier + '_history.pklz'), 'wb') as f:
     cPickle.dump(
         (history.epoch, history.history, history.params, history.validation_data, model.get_config()), f,
         cPickle.HIGHEST_PROTOCOL)
@@ -130,7 +131,7 @@ if plot_history:
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
-    plt.savefig('accuracy.jpg')
+    plt.savefig(os.path.join('dump', 'histories', model_identifier + '_accuracy.jpg'))
     plt.close()
     # summarize history for loss
     plt.plot(history.history['loss'])
@@ -139,4 +140,4 @@ if plot_history:
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
-    plt.savefig('loss.jpg')
+    plt.savefig(os.path.join('dump', 'histories', model_identifier + '_loss.jpg'))
