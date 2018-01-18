@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('Agg')
 import cPickle
 import os
 from keras.applications.vgg16 import VGG16
@@ -86,7 +88,8 @@ train_generator = datagen.flow_from_directory(train_data_dir,
 test_generator = datagen.flow_from_directory(test_data_dir,
                                              target_size=(img_width, img_height),
                                              batch_size=batch_size,
-                                             class_mode='categorical')
+                                             class_mode='categorical',
+                                             shuffle=False)
 
 validation_generator = datagen.flow_from_directory(val_data_dir,
                                                    target_size=(img_width, img_height),
@@ -114,7 +117,7 @@ with open(os.path.join('dump','histories') + model_identifier + '_history.pklz',
         (history.epoch, history.history, history.params, history.validation_data, model.get_config()), f,
         cPickle.HIGHEST_PROTOCOL)
 
-result = model.evaluate_generator(test_generator, val_samples=807)
+result = model.evaluate_generator(test_generator)
 print result
 
 # list all data in history
