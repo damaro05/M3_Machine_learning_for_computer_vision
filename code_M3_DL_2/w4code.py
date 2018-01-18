@@ -107,12 +107,12 @@ if not os.path.exists('dump'):
 if not os.path.exists(os.path.join('dump','models')):
     os.mkdir(os.path.join('dump','models'))
 
-model.save_weights(os.path.join('dump','models') + model_identifier + '.h5')
+model.save_weights(os.path.join('dump','models', model_identifier + '.h5'))
 
 if not os.path.exists(os.path.join('dump','histories')):
     os.mkdir(os.path.join('dump','histories'))
 
-with open(os.path.join('dump','histories') + model_identifier + '_history.pklz', 'wb') as f:
+with open(os.path.join('dump','histories', model_identifier + '_history.pklz'), 'wb') as f:
     cPickle.dump(
         (history.epoch, history.history, history.params, history.validation_data, model.get_config()), f,
         cPickle.HIGHEST_PROTOCOL)
