@@ -1,3 +1,5 @@
+import cPickle
+import os
 from keras.applications.vgg16 import VGG16
 from keras.preprocessing import image
 from keras.models import Model
@@ -16,7 +18,9 @@ img_width = 224
 img_height = 224
 batch_size = 32
 number_of_epoch = 20
+model_identifier = 'base_code'
 plot_history = True
+
 
 def preprocess_input(x, dim_ordering='default'):
     if dim_ordering == 'default':
@@ -90,12 +94,21 @@ validation_generator = datagen.flow_from_directory(val_data_dir,
                                                    class_mode='categorical')
 
 history = model.fit_generator(train_generator,
-                              steps_per_epoch=400 / batch_size + 1, #batch_size*(int(400*1881/1881//batch_size)+1)
+                              steps_per_epoch=400 / batch_size + 1,  # batch_size*(int(400*1881/1881//batch_size)+1)
                               epochs=number_of_epoch,
                               validation_data=validation_generator,
                               validation_steps=validation_generator.samples / batch_size)
+if not os.path.exists('dump/models'):
+    os.mkdir('dump/models')
+model.save_weights('dump/models/' + model_identifier + '.h5')
 
-model.save_weights('base_code.h5')
+if not os.path.exists('dump/histories'):
+    os.mkdir('dump/histories')
+with open('dump/histories/' + model_identifier + '_history.pklz', 'wb') as f:
+    cPickle.dump(
+        (history.epoch, history.history, history.params, history.validation_data, model.get_config()), f,
+        cPickle.HIGHEST_PROTOCOL)
+
 result = model.evaluate_generator(test_generator, val_samples=807)
 print result
 
