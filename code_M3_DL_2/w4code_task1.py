@@ -6,7 +6,7 @@ import os
 from keras.applications.vgg16 import VGG16
 from keras.preprocessing import image
 from keras.models import Model
-from keras.layers import Flatten
+from keras.layers import Flatten, AveragePooling2D
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras import backend as K
 # from keras.utils.visualize_util import plot
@@ -52,11 +52,17 @@ def preprocess_input(x, dim_ordering='default'):
 base_model = VGG16(weights='imagenet')
 plot_model(base_model, to_file=os.path.join('dump', 'models','modelVGG16.png'), show_shapes=True, show_layer_names=True)
 
+# Not valid: mem alloc error
 #x = base_model.get_layer('block4_pool').output
+
 x = base_model.get_layer('block4_conv3').output
-#x = MaxPooling
-#x = Flatten()(x)
-x = GlobalAveragePooling2D()(x)
+# Method 1: 7x7x512
+x = AveragePooling2D(pool_size=(4,4),strides=(4,4))(x) #Strides???
+x = Flatten()(x)
+
+# Method 2: maybe too much? only one value per channel i.e. 1x512
+#x = GlobalAveragePooling2D()(x)
+
 x = Dense(4096, activation='relu', name='fc1')(x)
 x = Dense(4096, activation='relu', name='fc2')(x)
 x = Dense(8, activation='softmax', name='predictions')(x)
