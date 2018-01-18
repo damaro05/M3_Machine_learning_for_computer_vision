@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 from keras.utils import plot_model
 
 train_data_dir = '/share/datasets/MIT_split/train'
-val_data_dir = '/share/datasets/MIT_split/MIT/test'
-test_data_dir = '/share/datasets/MIT_split/MIT/test'
+val_data_dir = '/share/datasets/MIT_split/test'
+test_data_dir = '/share/datasets/MIT_split/test'
 img_width = 224
 img_height = 224
 batch_size = 32
