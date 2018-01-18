@@ -14,7 +14,7 @@ from keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 from keras.utils import plot_model
 
-os.environ["CUDA_VISIBLE_DEVICES"]="4"
+os.environ["CUDA_VISIBLE_DEVICES"] = "4"
 train_data_dir = '/share/datasets/MIT_split/train'
 val_data_dir = '/share/datasets/MIT_split/test'
 test_data_dir = '/share/datasets/MIT_split/test'
@@ -22,7 +22,7 @@ img_width = 224
 img_height = 224
 batch_size = 32
 number_of_epoch = 20
-model_identifier = '4th_block'
+script_identifier = 'task_1'
 plot_history = True
 
 
@@ -50,25 +50,28 @@ def preprocess_input(x, dim_ordering='default'):
 
 # create the base pre-trained model
 base_model = VGG16(weights='imagenet')
-plot_model(base_model, to_file=os.path.join('dump', 'models','modelVGG16.png'), show_shapes=True, show_layer_names=True)
+plot_model(base_model, to_file=os.path.join('dump', 'models', 'modelVGG16.png'), show_shapes=True,
+           show_layer_names=True)
 
 # Not valid: mem alloc error
-#x = base_model.get_layer('block4_pool').output
+# x = base_model.get_layer('block4_pool').output
 
 x = base_model.get_layer('block4_conv3').output
-# Method 1: 7x7x512
-x = AveragePooling2D(pool_size=(4,4),strides=(4,4))(x) #Strides???
+# Method 1: 7x7x512 maybe too difficult? doesn't work properly
+x = AveragePooling2D(pool_size=(4, 4), strides=(4, 4))(x)  # Strides? Size of pixel jump
 x = Flatten()(x)
 
 # Method 2: maybe too much? only one value per channel i.e. 1x512
-#x = GlobalAveragePooling2D()(x)
+# x = GlobalAveragePooling2D()(x)
 
 x = Dense(4096, activation='relu', name='fc1')(x)
 x = Dense(4096, activation='relu', name='fc2')(x)
 x = Dense(8, activation='softmax', name='predictions')(x)
 
 model = Model(inputs=base_model.input, outputs=x)
-plot_model(model, to_file=os.path.join('dump', 'models',model_identifier+'.png'), show_shapes=True, show_layer_names=True)
+model_identifier=str(hash(str(model.get_config())))
+plot_model(model, to_file=os.path.join('dump', 'models', script_identifier + '_' + model_identifier + '.png'),
+           show_shapes=True, show_layer_names=True)
 for layer in base_model.layers:
     layer.trainable = False
 
@@ -121,12 +124,15 @@ if not os.path.exists('dump'):
 if not os.path.exists(os.path.join('dump', 'models')):
     os.mkdir(os.path.join('dump', 'models'))
 
-model.save_weights(os.path.join('dump', 'models', model_identifier + '.h5'))
+model.save_weights(os.path.join('dump', 'models',
+                                script_identifier + '_' + model_identifier + '_' + batch_size + '_' + number_of_epoch + '.h5'))
 
 if not os.path.exists(os.path.join('dump', 'histories')):
     os.mkdir(os.path.join('dump', 'histories'))
 
-with open(os.path.join('dump', 'histories', model_identifier + '_history.pklz'), 'wb') as f:
+with open(os.path.join('dump', 'histories',
+                       script_identifier + '_' + model_identifier + '_' + batch_size + '_' + number_of_epoch + '_history.pklz'),
+          'wb') as f:
     cPickle.dump(
         (history.epoch, history.history, history.params, history.validation_data, model.get_config()), f,
         cPickle.HIGHEST_PROTOCOL)
@@ -144,7 +150,8 @@ if plot_history:
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
-    plt.savefig(os.path.join('dump', 'histories', model_identifier + '_accuracy.jpg'))
+    plt.savefig(os.path.join('dump', 'histories',
+                             script_identifier + '_' + model_identifier + '_' + batch_size + '_' + number_of_epoch + '_accuracy.jpg'))
     plt.close()
     # summarize history for loss
     plt.plot(history.history['loss'])
@@ -153,4 +160,5 @@ if plot_history:
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
-    plt.savefig(os.path.join('dump', 'histories', model_identifier + '_loss.jpg'))
+    plt.savefig(os.path.join('dump', 'histories',
+                             script_identifier + '_' + model_identifier + '_' + batch_size + '_' + number_of_epoch + '_loss.jpg'))
