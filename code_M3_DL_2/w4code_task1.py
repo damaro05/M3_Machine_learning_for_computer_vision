@@ -52,8 +52,11 @@ def preprocess_input(x, dim_ordering='default'):
 base_model = VGG16(weights='imagenet')
 plot_model(base_model, to_file=os.path.join('dump', 'models','modelVGG16.png'), show_shapes=True, show_layer_names=True)
 
-x = base_model.get_layer('block4_pool').output
-x = Flatten()(x)
+#x = base_model.get_layer('block4_pool').output
+x = base_model.get_layer('block4_conv3').output
+#x = MaxPooling
+#x = Flatten()(x)
+x = GlobalAveragePooling2D()(x)
 x = Dense(4096, activation='relu', name='fc1')(x)
 x = Dense(4096, activation='relu', name='fc2')(x)
 x = Dense(8, activation='softmax', name='predictions')(x)
