@@ -21,7 +21,7 @@ test_data_dir = '/share/datasets/MIT_split/test'
 img_width = 224
 img_height = 224
 batch_size = 32
-number_of_epoch = 20
+number_of_epoch = 50
 script_identifier = 'task_1'
 plot_history = True
 
@@ -55,24 +55,24 @@ plot_model(base_model, to_file=os.path.join('dump', 'models', 'modelVGG16.png'),
 
 # Not valid: mem alloc error
 x = base_model.get_layer('block4_pool').output
-x = Conv2D(filters=512,kernel_size=(3,3),strides=(2,2))(x)
+x = Conv2D(filters=512, kernel_size=(3, 3), strides=(2, 2))(x)
 
-#x = base_model.get_layer('block4_conv3').output
+# x = base_model.get_layer('block4_conv3').output
 # Method 1: 7x7x512 maybe too difficult? doesn't work properly
 # Try with maxpool
 # See what ramon says in the email
-#x = MaxPooling2D(pool_size=(4, 4), strides=(4, 4))(x)  # Strides? Size of pixel jump
+# x = MaxPooling2D(pool_size=(4, 4), strides=(4, 4))(x)  # Strides? Size of pixel jump
 x = Flatten()(x)
 
 # Method 2: maybe too much? only one value per channel i.e. 1x512
 # x = GlobalAveragePooling2D()(x)
 
 x = Dense(4096, activation='relu', name='fc1')(x)
-x = Dense(4096, activation='relu', name='fc2')(x)
+#x = Dense(4096, activation='relu', name='fc2')(x)
 x = Dense(8, activation='softmax', name='predictions')(x)
 
 model = Model(inputs=base_model.input, outputs=x)
-model_identifier=str(hash(str(model.get_config())))
+model_identifier = str(hash(str(model.get_config())))
 plot_model(model, to_file=os.path.join('dump', 'models', script_identifier + '_' + model_identifier + '.png'),
            show_shapes=True, show_layer_names=True)
 for layer in base_model.layers:
@@ -128,13 +128,15 @@ if not os.path.exists(os.path.join('dump', 'models')):
     os.mkdir(os.path.join('dump', 'models'))
 
 model.save_weights(os.path.join('dump', 'models',
-                                script_identifier + '_' + model_identifier + '_' + batch_size + '_' + number_of_epoch + '.h5'))
+                                script_identifier + '_' + model_identifier + '_' + str(batch_size) + '_' + str(
+                                    number_of_epoch) + '.h5'))
 
 if not os.path.exists(os.path.join('dump', 'histories')):
     os.mkdir(os.path.join('dump', 'histories'))
 
 with open(os.path.join('dump', 'histories',
-                       script_identifier + '_' + model_identifier + '_' + batch_size + '_' + number_of_epoch + '_history.pklz'),
+                       script_identifier + '_' + model_identifier + '_' + str(batch_size) + '_' + str(
+                           number_of_epoch) + '_history.pklz'),
           'wb') as f:
     cPickle.dump(
         (history.epoch, history.history, history.params, history.validation_data, model.get_config()), f,
@@ -154,7 +156,8 @@ if plot_history:
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
     plt.savefig(os.path.join('dump', 'histories',
-                             script_identifier + '_' + model_identifier + '_' + batch_size + '_' + number_of_epoch + '_accuracy.jpg'))
+                             script_identifier + '_' + model_identifier + '_' + str(batch_size) + '_' + str(
+                                 number_of_epoch) + '_accuracy.jpg'))
     plt.close()
     # summarize history for loss
     plt.plot(history.history['loss'])
@@ -164,4 +167,5 @@ if plot_history:
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
     plt.savefig(os.path.join('dump', 'histories',
-                             script_identifier + '_' + model_identifier + '_' + batch_size + '_' + number_of_epoch + '_loss.jpg'))
+                             script_identifier + '_' + model_identifier + '_' + str(batch_size) + '_' + str(
+                                 number_of_epoch) + '_loss.jpg'))
