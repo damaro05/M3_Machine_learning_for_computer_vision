@@ -22,7 +22,8 @@ val_data_dir = '/share/datasets/MIT_split/test'
 test_data_dir = '/share/datasets/MIT_split/test'
 img_width = 224
 img_height = 224
-batch_size = 32
+batch_size = 64
+n_train_samples = 800
 number_of_epoch = 200
 script_identifier = 'task_1'
 plot_history = True
@@ -57,6 +58,11 @@ def preprocess_input(x, dim_ordering='default'):
         x[:, :, 2] /= 59.14847488
     return x
 
+if not os.path.exists(os.path.join('dump', 'models')):
+    os.makedirs(os.path.join('dump', 'models'))
+
+if not os.path.exists(os.path.join('dump', 'histories')):
+    os.makedirs(os.path.join('dump', 'histories'))
 
 # create the base pre-trained model
 base_model = VGG16(weights='imagenet')
@@ -92,7 +98,6 @@ model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['a
 for layer in model.layers:
     print layer.name, layer.trainable
 
-# preprocessing_function=preprocess_input,
 datagen = ImageDataGenerator(preprocessing_function=preprocess_input,
                              rotation_range=0.,
                              width_shift_range=0.,
@@ -120,41 +125,18 @@ validation_generator = datagen.flow_from_directory(val_data_dir,
                                                    target_size=(img_width, img_height),
                                                    batch_size=batch_size,
                                                    class_mode='categorical')
-
+#first training
 estop_loss=EarlyStopping(monitor='val_loss',min_delta=.25,patience=5,verbose=1)
 estop_acc=EarlyStopping(monitor='val_acc',min_delta=.01,patience=5,verbose=1)
 history = model.fit_generator(train_generator,
-                              steps_per_epoch=400 / batch_size + 1,  # batch_size*(int(400*1881/1881//batch_size)+1)
+                              steps_per_epoch=n_train_samples / batch_size,  # batch_size*(int(400*1881/1881//batch_size)+1)
                               epochs=number_of_epoch,
                               validation_data=validation_generator,
                               validation_steps=validation_generator.samples / batch_size,
                               callbacks=[estop_acc,estop_loss])
-for layer in base_model.layers:
-    layer.trainable = True
-
-#model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
-for layer in model.layers:
-    print layer.name, layer.trainable
-
-history2 = model.fit_generator(train_generator,
-                              steps_per_epoch=400 / batch_size + 1,  # batch_size*(int(400*1881/1881//batch_size)+1)
-                              epochs=number_of_epoch,
-                              validation_data=validation_generator,
-                              validation_steps=validation_generator.samples / batch_size,
-                              callbacks=[estop_acc,estop_loss])
-
-if not os.path.exists('dump'):
-    os.mkdir('dump')
-
-if not os.path.exists(os.path.join('dump', 'models')):
-    os.mkdir(os.path.join('dump', 'models'))
-
 model.save_weights(os.path.join('dump', 'models',
                                 script_identifier + '_' + model_identifier + '_' + str(batch_size) + '_' + str(
                                     number_of_epoch) + '.h5'))
-
-if not os.path.exists(os.path.join('dump', 'histories')):
-    os.mkdir(os.path.join('dump', 'histories'))
 
 with open(os.path.join('dump', 'histories',
                        script_identifier + '_' + model_identifier + '_' + str(batch_size) + '_' + str(
@@ -164,6 +146,26 @@ with open(os.path.join('dump', 'histories',
         (history.epoch, history.history, history.params, history.validation_data, model.get_config()), f,
         cPickle.HIGHEST_PROTOCOL)
 
+#second training
+for layer in base_model.layers:
+    layer.trainable = True
+
+model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
+for layer in model.layers:
+    print layer.name, layer.trainable
+model.load_weights(os.path.join('dump', 'models',
+                                script_identifier + '_' + model_identifier + '_' + str(batch_size) + '_' + str(
+                                    number_of_epoch) + '.h5'))
+history2 = model.fit_generator(train_generator,
+                              steps_per_epoch=n_train_samples / batch_size,  # batch_size*(int(400*1881/1881//batch_size)+1)
+                              epochs=number_of_epoch,
+                              validation_data=validation_generator,
+                              validation_steps=validation_generator.samples / batch_size,
+                              callbacks=[estop_acc,estop_loss])
+model.save_weights(os.path.join('dump', 'models',
+                                script_identifier + '_' + model_identifier + '_' + str(batch_size) + '_' + str(
+                                    number_of_epoch) + '.h5'))
+
 with open(os.path.join('dump', 'histories',
                        script_identifier + '_' + model_identifier + '_' + str(batch_size) + '_' + str(
                            number_of_epoch) + '_history2.pklz'),
@@ -172,6 +174,7 @@ with open(os.path.join('dump', 'histories',
         (history2.epoch, history2.history, history2.params, history2.validation_data, model.get_config()), f,
         cPickle.HIGHEST_PROTOCOL)
 
+#evaluate
 result = model.evaluate_generator(test_generator)
 print result
 
