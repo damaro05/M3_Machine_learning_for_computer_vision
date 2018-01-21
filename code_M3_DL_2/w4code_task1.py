@@ -129,6 +129,20 @@ history = model.fit_generator(train_generator,
                               validation_data=validation_generator,
                               validation_steps=validation_generator.samples / batch_size,
                               callbacks=[estop_acc,estop_loss])
+for layer in base_model.layers:
+    layer.trainable = True
+
+#model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
+for layer in model.layers:
+    print layer.name, layer.trainable
+
+history2 = model.fit_generator(train_generator,
+                              steps_per_epoch=400 / batch_size + 1,  # batch_size*(int(400*1881/1881//batch_size)+1)
+                              epochs=number_of_epoch,
+                              validation_data=validation_generator,
+                              validation_steps=validation_generator.samples / batch_size,
+                              callbacks=[estop_acc,estop_loss])
+
 if not os.path.exists('dump'):
     os.mkdir('dump')
 
@@ -148,6 +162,14 @@ with open(os.path.join('dump', 'histories',
           'wb') as f:
     cPickle.dump(
         (history.epoch, history.history, history.params, history.validation_data, model.get_config()), f,
+        cPickle.HIGHEST_PROTOCOL)
+
+with open(os.path.join('dump', 'histories',
+                       script_identifier + '_' + model_identifier + '_' + str(batch_size) + '_' + str(
+                           number_of_epoch) + '_history2.pklz'),
+          'wb') as f:
+    cPickle.dump(
+        (history2.epoch, history2.history, history2.params, history2.validation_data, model.get_config()), f,
         cPickle.HIGHEST_PROTOCOL)
 
 result = model.evaluate_generator(test_generator)
