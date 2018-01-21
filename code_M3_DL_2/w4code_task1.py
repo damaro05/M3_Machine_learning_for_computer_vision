@@ -72,6 +72,7 @@ plot_model(base_model, to_file=os.path.join('dump', 'models', 'modelVGG16.png'),
 # New hybrid model
 x = base_model.get_layer('block4_pool').output
 x = Conv2D(filters=512, kernel_size=(3, 3), strides=(2, 2))(x)
+x = Flatten()(x)
 x = Dense(4096, activation='relu', name='fc1')(x)
 x = Dense(8, activation='softmax', name='predictions')(x)
 model = Model(inputs=base_model.input, outputs=x)
