@@ -1,4 +1,6 @@
 import matplotlib
+from keras.callbacks import EarlyStopping
+from keras.initializers import glorot_uniform
 
 matplotlib.use('Agg')
 import cPickle
@@ -21,7 +23,7 @@ test_data_dir = '/share/datasets/MIT_split/test'
 img_width = 224
 img_height = 224
 batch_size = 32
-number_of_epoch = 50
+number_of_epoch = 200
 script_identifier = 'task_1'
 plot_history = True
 
@@ -35,16 +37,24 @@ def preprocess_input(x, dim_ordering='default'):
         # 'RGB'->'BGR'
         x = x[::-1, :, :]
         # Zero-center by mean pixel
-        x[0, :, :] -= 103.939
-        x[1, :, :] -= 116.779
-        x[2, :, :] -= 123.68
+        x[0, :, :] -= 109.07621812  # 103.939
+        x[1, :, :] -= 115.45609435  # 116.779
+        x[2, :, :] -= 114.70990406  # 123.68
+        # Normalize by std
+        x[0, :, :] /= 56.91689916
+        x[1, :, :] /= 55.4694083
+        x[2, :, :] /= 59.14847488
     else:
         # 'RGB'->'BGR'
         x = x[:, :, ::-1]
         # Zero-center by mean pixel
-        x[:, :, 0] -= 103.939
-        x[:, :, 1] -= 116.779
-        x[:, :, 2] -= 123.68
+        x[:, :, 0] -= 109.07621812  # 103.939
+        x[:, :, 1] -= 115.45609435  # 116.779
+        x[:, :, 2] -= 114.70990406  # 123.68
+        # Normalize by std
+        x[:, :, 0] /= 56.91689916
+        x[:, :, 1] /= 55.4694083
+        x[:, :, 2] /= 59.14847488
     return x
 
 
@@ -55,7 +65,7 @@ plot_model(base_model, to_file=os.path.join('dump', 'models', 'modelVGG16.png'),
 
 # Not valid: mem alloc error
 x = base_model.get_layer('block4_pool').output
-x = Conv2D(filters=512, kernel_size=(3, 3), strides=(2, 2))(x)
+x = Conv2D(filters=256, kernel_size=(3, 3), strides=(2, 2))(x)
 
 # x = base_model.get_layer('block4_conv3').output
 # Method 1: 7x7x512 maybe too difficult? doesn't work properly
@@ -68,7 +78,7 @@ x = Flatten()(x)
 # x = GlobalAveragePooling2D()(x)
 
 x = Dense(4096, activation='relu', name='fc1')(x)
-#x = Dense(4096, activation='relu', name='fc2')(x)
+# x = Dense(4096, activation='relu', name='fc2')(x)
 x = Dense(8, activation='softmax', name='predictions')(x)
 
 model = Model(inputs=base_model.input, outputs=x)
@@ -83,11 +93,7 @@ for layer in model.layers:
     print layer.name, layer.trainable
 
 # preprocessing_function=preprocess_input,
-datagen = ImageDataGenerator(featurewise_center=False,
-                             samplewise_center=True,
-                             featurewise_std_normalization=False,
-                             samplewise_std_normalization=True,
-                             preprocessing_function=preprocess_input,
+datagen = ImageDataGenerator(preprocessing_function=preprocess_input,
                              rotation_range=0.,
                              width_shift_range=0.,
                              height_shift_range=0.,
@@ -97,8 +103,7 @@ datagen = ImageDataGenerator(featurewise_center=False,
                              fill_mode='nearest',
                              cval=0.,
                              horizontal_flip=False,
-                             vertical_flip=False,
-                             rescale=None)
+                             vertical_flip=False)
 
 train_generator = datagen.flow_from_directory(train_data_dir,
                                               target_size=(img_width, img_height),
@@ -116,11 +121,15 @@ validation_generator = datagen.flow_from_directory(val_data_dir,
                                                    batch_size=batch_size,
                                                    class_mode='categorical')
 
+estop_loss=EarlyStopping(monitor='val_loss',min_delta=.25,patience=5,verbose=1)
+estop_acc=EarlyStopping(monitor='val_acc',min_delta=.01,patience=5,verbose=1)
 history = model.fit_generator(train_generator,
-                              steps_per_epoch=400 / batch_size + 1,  # batch_size*(int(400*1881/1881//batch_size)+1)
+                              steps_per_epoch=train_generator.samples / batch_size,
+                              # 400 / batch_size + 1,  # batch_size*(int(400*1881/1881//batch_size)+1)
                               epochs=number_of_epoch,
                               validation_data=validation_generator,
-                              validation_steps=validation_generator.samples / batch_size)
+                              validation_steps=validation_generator.samples / batch_size,
+                              callbacks=[estop_acc,estop_loss])
 if not os.path.exists('dump'):
     os.mkdir('dump')
 
