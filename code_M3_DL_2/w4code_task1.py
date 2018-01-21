@@ -65,7 +65,7 @@ plot_model(base_model, to_file=os.path.join('dump', 'models', 'modelVGG16.png'),
 
 # Not valid: mem alloc error
 x = base_model.get_layer('block4_pool').output
-x = Conv2D(filters=256, kernel_size=(3, 3), strides=(2, 2))(x)
+x = Conv2D(filters=512, kernel_size=(3, 3), strides=(2, 2))(x)
 
 # x = base_model.get_layer('block4_conv3').output
 # Method 1: 7x7x512 maybe too difficult? doesn't work properly
@@ -124,8 +124,7 @@ validation_generator = datagen.flow_from_directory(val_data_dir,
 estop_loss=EarlyStopping(monitor='val_loss',min_delta=.25,patience=5,verbose=1)
 estop_acc=EarlyStopping(monitor='val_acc',min_delta=.01,patience=5,verbose=1)
 history = model.fit_generator(train_generator,
-                              steps_per_epoch=train_generator.samples / batch_size,
-                              # 400 / batch_size + 1,  # batch_size*(int(400*1881/1881//batch_size)+1)
+                              steps_per_epoch=400 / batch_size + 1,  # batch_size*(int(400*1881/1881//batch_size)+1)
                               epochs=number_of_epoch,
                               validation_data=validation_generator,
                               validation_steps=validation_generator.samples / batch_size,
