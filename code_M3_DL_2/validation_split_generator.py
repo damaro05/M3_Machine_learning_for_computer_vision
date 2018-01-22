@@ -3,8 +3,8 @@ import numpy as np
 import shutil
 
 dataset_dir = '/share/datasets/MIT_split'
-destination_dir = '/share/datasets/MIT_split'
-validation_size = .3
+destination_dir = '/home/master04/data/MIT_400'
+validation_size = .213
 rand_seed = 2018  # None
 
 if not os.path.exists(dataset_dir):
