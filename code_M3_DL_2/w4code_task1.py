@@ -17,14 +17,13 @@ import matplotlib.pyplot as plt
 from keras.utils import plot_model
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "4"
-train_data_dir = '/share/datasets/MIT_split/train'
+train_data_dir = '/home/master04/data/MIT_400/validation_split'
 val_data_dir = '/share/datasets/MIT_split/test'
 test_data_dir = '/share/datasets/MIT_split/test'
 img_width = 224
 img_height = 224
-batch_size = 64
-n_train_samples = 400
-number_of_epoch = 20
+batch_size = 32
+number_of_epoch = 50
 script_identifier = 'task_1'
 plot_history = True
 
@@ -120,7 +119,7 @@ validation_generator = datagen.flow_from_directory(val_data_dir,
 #estop_loss=EarlyStopping(monitor='val_loss',min_delta=.25,patience=5,verbose=1)
 #estop_acc=EarlyStopping(monitor='val_acc',min_delta=.01,patience=5,verbose=1)
 history = model.fit_generator(train_generator,
-                              steps_per_epoch=n_train_samples / batch_size,  # batch_size*(int(400*1881/1881//batch_size)+1)
+                              steps_per_epoch=train_generator.samples / batch_size,  # batch_size*(int(400*1881/1881//batch_size)+1)
                               epochs=number_of_epoch,
                               validation_data=validation_generator,
                               validation_steps=validation_generator.samples / batch_size)
