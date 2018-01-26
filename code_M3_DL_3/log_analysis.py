@@ -5,7 +5,7 @@ import matplotlib.lines as mlines
 import numpy as np
 from load_history import ExecutionInfo
 import os
-cnnexecutions = pd.read_csv('architecture_alternatives/log.csv',index_col='born_time',names=['born_time','type','hash','val_loss','val_acc'],sep=';')
+cnnexecutions = pd.read_csv('architecture_alternatives/log2.csv',index_col='born_time',names=['born_time','type','hash','val_loss','val_acc'],sep=';')
 
 train_acc = []
 train_loss = []

@@ -14,16 +14,16 @@ import numpy as np
 class CNNmodel2:
     def __init__(self, img_size=(256, 256), dump_path='dump/'):
         # Random parameters
-        conv1_filters = np.random.randint(1,65)
-        conv2_filters = np.random.randint(1,65)
-        conv1_kernel = np.random.randint(2,10)
-        conv2_kernel = np.random.randint(2,10)
+        conv1_filters = np.random.randint(1,65) #65
+        conv2_filters = np.random.randint(1,65) #65
+        conv1_kernel = np.random.randint(2,12) #10
+        conv2_kernel = np.random.randint(2,12) #10
         conv1_strides = np.random.randint(1,conv1_kernel/2+1)
         conv2_strides = np.random.randint(1,conv2_kernel/2+1)
-        maxpool1_size = np.random.randint(2,10)
-        maxpool2_size = np.random.randint(2,10)
-        fc1_units = 2**np.random.randint(6,11)
-        fc2_units = 2**np.random.randint(6,11)
+        maxpool1_size = np.random.randint(2,12) #10
+        maxpool2_size = np.random.randint(2,12) #10
+        fc1_units = 2**np.random.randint(6,12) #11
+        fc2_units = 2**np.random.randint(6,12) #11
 
 
         # Model architecture

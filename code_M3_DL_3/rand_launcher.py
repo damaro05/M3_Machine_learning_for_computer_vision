@@ -14,7 +14,8 @@ val_data_dir = '/share/datasets/MIT_split/test'
 test_data_dir = '/share/datasets/MIT_split/test'
 batch_size = 32
 number_of_epoch = 25
-type = np.random.randint(1, 8)
+type = 2 #np.random.randint(1, 8)
+
 if type == 1:
     cnn = CNNmodel1()
 elif type == 2:
