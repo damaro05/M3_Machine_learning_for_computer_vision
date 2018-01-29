@@ -3,7 +3,8 @@ import os
 import time
 from keras import Sequential
 from keras import backend as K
-from keras.layers import Conv2D, Flatten, Dense, MaxPooling2D, Dropout
+from keras.callbacks import TensorBoard, ReduceLROnPlateau
+from keras.layers import Conv2D, Flatten, Dense, MaxPooling2D, Dropout, BatchNormalization
 from keras.optimizers import Adam
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import plot_model
@@ -12,7 +13,7 @@ import numpy as np
 
 
 class CNNmodel:
-    def __init__(self, img_size=(256, 256), dump_path='dump/',optimizer='none', dropout=0, datagen=0):
+    def __init__(self, img_size=(256, 256), dump_path='dump/',optimizer=Adam(), dropout=[0,0,1], datagen=0,lr_reduce_factor=0.1):
         # Random parameters
         conv1_filters = 27
         conv1_kernel = 7
@@ -58,28 +59,40 @@ class CNNmodel:
                               activation='relu',
                               input_shape=(img_size[0], img_size[1], 3),
                               name='conv1'))
+        if dropout[1]==1:
+            self.model.add(Dropout(0.5, name='dropout_conv1a'))
         self.model.add(MaxPooling2D(pool_size=(maxpool1_size, maxpool1_size),
                                     strides=None,
                                     name='maxpool1'))
+
+        self.model.add(BatchNormalization())
+        if dropout[0]==1:
+            self.model.add(Dropout(0.5, name='dropout_conv2b'))
         self.model.add(Conv2D(filters=conv2_filters,
                               kernel_size=(conv2_kernel, conv2_kernel),
                               strides=(conv2_strides, conv2_strides),
                               activation='relu',
                               name='conv2'))
+        if dropout[1]==1:
+            self.model.add(Dropout(0.5, name='dropout_conv2a'))
         self.model.add(MaxPooling2D(pool_size=(maxpool2_size, maxpool2_size),
                                     strides=None,
                                     name='maxpool2'))
-        if dropout==1:
-            self.model.add(Dropout(0.5, name='dropout'))
-        self.model.add(Flatten())
-        self.model.add(Dense(units=fc1_units, activation='relu', name='fc1'))
-        self.model.add(Dense(units=fc2_units, activation='relu', name='fc2'))
-                 
-        self.model.add(Dense(units=8, activation='softmax', name='classif'))
 
-        # Optimizer
-        if optimizer=='none':
-            optimizer = Adam()
+        self.model.add(Flatten())
+
+        self.model.add(BatchNormalization())
+        self.model.add(Dense(units=fc1_units, activation='relu', name='fc1'))
+        if dropout[2]==1:
+            self.model.add(Dropout(0.5, name='dropout_fc1'))
+
+        self.model.add(BatchNormalization())
+        self.model.add(Dense(units=fc2_units, activation='relu', name='fc2'))
+        if dropout[2]==1:
+            self.model.add(Dropout(0.5, name='dropout_fc2'))
+
+        self.model.add(BatchNormalization())
+        self.model.add(Dense(units=8, activation='softmax', name='classif'))
 
         # Compile
         self.model.compile(loss='categorical_crossentropy',
@@ -90,6 +103,7 @@ class CNNmodel:
         self.identifier = str(hash(str(self.model.get_config())))
         self.dump_path = os.path.join(dump_path, str(self.born_time) + '_' + self.identifier)
         self.input_img_size = img_size
+        self.lr_reduce_factor=lr_reduce_factor
 
         # Print
         if not os.path.exists(self.dump_path):
@@ -107,8 +121,8 @@ class CNNmodel:
                                            class_mode='categorical')
 
     def _test_val_generator(self, path, batch_size):
-#        datagen = ImageDataGenerator(preprocessing_function=self._preprocess_input)
-        return self.datagen.flow_from_directory(path,
+        datagen = ImageDataGenerator(preprocessing_function=self._preprocess_input)
+        return datagen.flow_from_directory(path,
                                            target_size=self.input_img_size,
                                            batch_size=batch_size,
                                            class_mode='categorical',
@@ -123,11 +137,15 @@ class CNNmodel:
             validation_generator = self._test_val_generator(val_path, batch_size)
             validation_steps = validation_generator.samples / batch_size
 
+        callbacks = [TensorBoard(log_dir='logs/'+self.born_time),
+                     ReduceLROnPlateau(monitor='val_loss', factor=self.lr_reduce_factor, patience=5, verbose=1)]
+
         history = self.model.fit_generator(train_generator,
                                            steps_per_epoch=train_generator.samples / batch_size,
                                            epochs=epochs,
                                            validation_data=validation_generator,
-                                           validation_steps=validation_steps)
+                                           validation_steps=validation_steps,
+                                           callbacks=callbacks)
         utils.plot_history(history, self.dump_path, identifier='e' + str(epochs) + '_b' + str(batch_size))
         with open(os.path.join(self.dump_path, 'e' + str(epochs) + '_b' + str(batch_size) + '_history.pklz'),
                   'wb') as f:
