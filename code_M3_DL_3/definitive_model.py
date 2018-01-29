@@ -3,8 +3,9 @@ import os
 import time
 from keras import Sequential
 from keras import backend as K
-from keras.layers import Conv2D, Flatten, Dense, MaxPooling2D
-from keras.optimizers import Adam
+from keras.callbacks import TensorBoard, ReduceLROnPlateau, ModelCheckpoint
+from keras.layers import Conv2D, Flatten, Dense, MaxPooling2D, Dropout, BatchNormalization
+from keras.optimizers import Adam, Nadam
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import plot_model
 import utils
@@ -33,26 +34,37 @@ class CNNmodel:
                               activation='relu',
                               input_shape=(img_size[0], img_size[1], 3),
                               name='conv1'))
+
         self.model.add(MaxPooling2D(pool_size=(maxpool1_size, maxpool1_size),
                                     strides=None,
                                     name='maxpool1'))
+
+        self.model.add(BatchNormalization())
         self.model.add(Conv2D(filters=conv2_filters,
                               kernel_size=(conv2_kernel, conv2_kernel),
                               strides=(conv2_strides, conv2_strides),
                               activation='relu',
                               name='conv2'))
+
         self.model.add(MaxPooling2D(pool_size=(maxpool2_size, maxpool2_size),
                                     strides=None,
                                     name='maxpool2'))
+
         self.model.add(Flatten())
+
+        self.model.add(BatchNormalization())
         self.model.add(Dense(units=fc1_units, activation='relu', name='fc1'))
+        self.model.add(Dropout(0.5, name='dropout_fc1'))
+
+        self.model.add(BatchNormalization())
         self.model.add(Dense(units=fc2_units, activation='relu', name='fc2'))
+        self.model.add(Dropout(0.5, name='dropout_fc2'))
+
+        self.model.add(BatchNormalization())
         self.model.add(Dense(units=8, activation='softmax', name='classif'))
 
-        # Optimizer
-        optimizer = Adam()
-
         # Compile
+        optimizer = Nadam(lr=0.00393)
         self.model.compile(loss='categorical_crossentropy',
                            optimizer=optimizer,
                            metrics=['accuracy'])
@@ -72,15 +84,15 @@ class CNNmodel:
 
     def _train_generator(self, path, batch_size):
         datagen = ImageDataGenerator(preprocessing_function=self._preprocess_input,
-                                     rotation_range=0,
-                                     width_shift_range=0.,
-                                     height_shift_range=0.,
-                                     shear_range=0.,
-                                     zoom_range=0.,
+                                     rotation_range=5,
+                                     width_shift_range=0.1,
+                                     height_shift_range=0.1,
+                                     shear_range=0.1,
+                                     zoom_range=0.1,
                                      channel_shift_range=0.,
                                      fill_mode='reflect',
                                      cval=0.,
-                                     horizontal_flip=False,
+                                     horizontal_flip=True,
                                      vertical_flip=False)
         return datagen.flow_from_directory(path,
                                            target_size=self.input_img_size,
@@ -104,11 +116,19 @@ class CNNmodel:
             validation_generator = self._test_val_generator(val_path, batch_size)
             validation_steps = validation_generator.samples / batch_size
 
+        callbacks = [TensorBoard(log_dir='logs/' + self.born_time),
+                     ReduceLROnPlateau(monitor='val_loss', factor=0.45802, patience=10, verbose=1)]
+        if save_weights:
+            callbacks.append(
+                ModelCheckpoint(os.path.join(self.dump_path, 'weights_' + time.strftime('%Y%m%d%H%M%S', time.gmtime())),
+                                verbose=1, period=20))
+
         history = self.model.fit_generator(train_generator,
                                            steps_per_epoch=train_generator.samples / batch_size,
                                            epochs=epochs,
                                            validation_data=validation_generator,
-                                           validation_steps=validation_steps)
+                                           validation_steps=validation_steps,
+                                           callbacks=callbacks)
         utils.plot_history(history, self.dump_path, identifier='e' + str(epochs) + '_b' + str(batch_size))
         with open(os.path.join(self.dump_path, 'e' + str(epochs) + '_b' + str(batch_size) + '_history.pklz'),
                   'wb') as f:
